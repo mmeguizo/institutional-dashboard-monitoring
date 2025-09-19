@@ -1,0 +1,198 @@
+<p-dialog
+    [header]="'File List'"
+    [(visible)]="viewObjectiveFileDialogCard"
+    [style]="{ width: '60rem' }"
+    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+    [maximizable]="true"
+    responsiveLayout="stack"
+    [closable]="false"
+    position="top"
+>
+    <div class="grid">
+        <div class="col-12">
+            <p-table
+                #dt3
+                [value]="AllObjectivesFiles"
+                dataKey="id"
+                [rows]="5"
+                [loading]="loading"
+                [rowHover]="true"
+                styleClass="p-datatable-gridlines"
+                [paginator]="true"
+                [globalFilterFields]="[
+                    'objectives.functional_objective',
+                    'date_added'
+                ]"
+                responsiveLayout="scroll"
+                [tableStyle]="{ 'min-width': '50rem' }"
+            >
+                <ng-template pTemplate="caption">
+                    <div
+                        class="flex justify-content-between flex-column sm:flex-row"
+                    >
+                        <button
+                            [disabled]="blockedPanel"
+                            pButton
+                            label="Clear"
+                            class="p-button-outlined mb-2"
+                            icon="pi pi-filter-slash"
+                            (click)="clear(dt3)"
+                        ></button>
+
+                        <!-- <p-button
+                            [disabled]="blockedPanel"
+                            icon="pi pi-upload"
+                            (click)="addFiles()"
+                            severity="success"
+                            [outlined]="true"
+                            pTooltip="Add Objectives"
+                            tooltipPosition="top"
+                        /> -->
+
+                        <span class="p-input-icon-left mb-2">
+                            <i class="pi pi-search"></i>
+                            <input
+                                [disabled]="blockedPanel"
+                                pInputText
+                                type="text"
+                                #filter
+                                (input)="onGlobalFilter(dt3, $event)"
+                                placeholder="Search Keyword"
+                                class="p-inputtext p-component p-element w-full"
+                            />
+                        </span>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Objectives
+                            </div>
+                        </th>
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Frequency File
+                            </div>
+                        </th>
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                File
+                            </div>
+                        </th>
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Date Added
+                            </div>
+                        </th>
+
+                        <th style="min-width: 9rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Options
+                            </div>
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-AllObjectivesFile>
+                    <tr>
+                        <td>
+                            {{
+                                AllObjectivesFile?.objectives
+                                    ?.functional_objective | titlecase
+                            }}
+                        </td>
+                        <td>
+                            {{ getFrequencyKeys(AllObjectivesFile) }}
+                        </td>
+
+                        <td>
+                            <a
+                                [href]="
+                                    this.auth.domain +
+                                    '/images/files/' +
+                                    AllObjectivesFile.source
+                                "
+                                target="_blank"
+                            >
+                                <i
+                                    class="text-4xl"
+                                    [ngClass]="
+                                        getIcon(
+                                            AllObjectivesFile.source
+                                                .split('.')
+                                                .pop()
+                                                .toLowerCase()
+                                        )
+                                    "
+                                ></i>
+                            </a>
+                        </td>
+                        <td>
+                            {{
+                                AllObjectivesFile.date_added
+                                    | date : "mediumDate"
+                            }}
+                        </td>
+
+                        <td>
+                            <div class="options-users">
+                                @if(blockedPanel){
+                                <i
+                                    class="pi pi-trash text-xl"
+                                    style="color: #868585"
+                                ></i>
+
+                                } @else {
+                                <i
+                                    (click)="
+                                        deleteSubGoalFile(
+                                            AllObjectivesFile.id,
+                                            AllObjectivesFile.source
+                                        )
+                                    "
+                                    class="pi pi-trash text-xl"
+                                    style="color: #ef4444; cursor: pointer"
+                                ></i>
+                                }
+
+                                <p-confirmPopup
+                                    key="deleteSubGoalFile"
+                                ></p-confirmPopup>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="emptymessage">
+                    <tr>
+                        <td colspan="8">No Files found.</td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="loadingbody">
+                    <tr>
+                        <td colspan="8">Loading Files data. Please wait.</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <p-button
+            label="Cancel"
+            [text]="true"
+            severity="secondary"
+            (click)="hideViewFileDialogCard()"
+        />
+    </ng-template>
+</p-dialog>

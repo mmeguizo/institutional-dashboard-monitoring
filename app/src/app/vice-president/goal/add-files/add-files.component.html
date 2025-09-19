@@ -1,0 +1,25 @@
+<p-dialog
+    styleClass="addObjective"
+    header="Drag and Drop Files"
+    [(visible)]="addObjectiveFileDialogCard"
+    [style]="{ width: '50rem' }"
+    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+    position="top"
+>
+    <div class="p-fluid">
+        <form [formGroup]="addFileForm">
+            <p-fileUpload
+                name="files"
+                (uploadHandler)="onUpload($event)"
+                customUpload="true"
+                multiple="false"
+                maxFileSize="20000000"
+                formControlName="files"
+                ngDefaultControl
+                [files]="uploadedFiles"
+            >
+            </p-fileUpload>
+        </form>
+    </div>
+    &nbsp;&nbsp;
+</p-dialog>

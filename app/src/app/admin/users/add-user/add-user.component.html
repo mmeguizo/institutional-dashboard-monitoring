@@ -1,0 +1,209 @@
+<p-dialog
+    header="Add User"
+    id="tester"
+    [(visible)]="addUserDialogCard"
+    showEffect="fade"
+    [style]="{ width: '50vw' }"
+    [breakpoints]="{ '1199px': '50vw', '890px': '40vw', '500px': '30vw' }"
+    [draggable]="false"
+    [resizable]="false"
+    (onHide)="resetForm()"
+>
+    <div class="card p-fluid">
+        <form [formGroup]="Addform">
+            <div class="field">
+                <label for="firstname">First Name</label>
+                <input
+                    pInputText
+                    id="firstname"
+                    class="flex-auto"
+                    autocomplete="off"
+                    [ngClass]="
+                        Addform?.get('firstname').touched &&
+                        Addform?.controls['firstname'].errors?.required
+                            ? 'ng-invalid ng-dirty'
+                            : ''
+                    "
+                    formControlName="firstname"
+                    required
+                />
+            </div>
+            <div class="field">
+                <label for="lastname">Last Name</label>
+                <input
+                    pInputText
+                    id="lastname"
+                    class="flex-auto"
+                    autocomplete="off"
+                    [ngClass]="
+                        Addform?.get('lastname').touched &&
+                        Addform?.controls['lastname'].errors?.required
+                            ? 'ng-invalid ng-dirty'
+                            : ''
+                    "
+                    formControlName="lastname"
+                    required
+                />
+            </div>
+            <div class="field">
+                <label for="username">Username</label>
+                <input
+                    pInputText
+                    id="username"
+                    class="flex-auto"
+                    autocomplete="off"
+                    [ngClass]="
+                        Addform?.get('username').touched &&
+                        Addform?.controls['username'].errors?.required
+                            ? 'ng-invalid ng-dirty'
+                            : ''
+                    "
+                    formControlName="username"
+                    required
+                />
+            </div>
+            <div class="field">
+                <label for="email">Email</label>
+                <input
+                    pInputText
+                    id="email"
+                    class="flex-auto"
+                    [ngClass]="
+                        Addform?.get('email').touched &&
+                        Addform?.controls['email'].errors?.required
+                            ? 'ng-invalid ng-dirty'
+                            : ''
+                    "
+                    formControlName="email"
+                    autocomplete="off"
+                    required
+                />
+                <div
+                    *ngIf="
+                        (Addform.get('email').hasError('required') &&
+                            Addform.get('email').touched) ||
+                        Addform.get('email').hasError('email') ||
+                        Addform.get('email').hasError('pattern')
+                    "
+                    class="bg-red-500 text-white p-2 rounded"
+                >
+                    <span
+                        *ngIf="
+                            Addform.get('email').touched &&
+                            Addform.get('email').hasError('required')
+                        "
+                    >
+                        You must enter an email address.
+                    </span>
+                    <span *ngIf="Addform.get('email').hasError('email')"
+                        >Please enter a valid email address.</span
+                    >
+                    <span *ngIf="Addform.get('email').hasError('pattern')"
+                        >Only Chmsu addresses (chmsu.edu.ph) are accepted.</span
+                    >
+                </div>
+            </div>
+            <div class="field">
+                <label for="password">Password</label>
+                <p-password
+                    id="password"
+                    class="flex-auto"
+                    autocomplete="off"
+                    [ngClass]="
+                        Addform?.get('password').touched &&
+                        Addform?.controls['password'].errors?.required
+                            ? 'ng-invalid ng-dirty'
+                            : ''
+                    "
+                    formControlName="password"
+                    required
+                    [toggleMask]="true"
+                />
+            </div>
+            <div class="field">
+                <label for="confirm">Confirm Password</label>
+                <p-password
+                    id="confirm"
+                    class="flex-auto"
+                    [ngClass]="
+                        Addform?.get('confirm').touched &&
+                        Addform?.controls['confirm'].errors?.required
+                            ? 'ng-invalid ng-dirty'
+                            : ''
+                    "
+                    formControlName="confirm"
+                    autocomplete="off"
+                    required
+                    [toggleMask]="true"
+                />
+            </div>
+            <div class="field">
+                <label htmlFor="department">Role</label>
+                <p-dropdown
+                    formControlName="role"
+                    [options]="roleOptions"
+                    optionLabel="name"
+                    placeholder="Select a Role"
+                />
+            </div>
+            <div class="field" *ngIf="!isVicePresident">
+                <form [formGroup]="formGroupVP">
+                    <label htmlFor="department">Vice Presidents</label>
+                    <p-dropdown
+                        formControlName="selectVP"
+                        [options]="selectVPDropdown"
+                        optionLabel="fullname"
+                        placeholder="Select a VP"
+                    />
+                </form>
+            </div>
+            <div class="field" *ngIf="!isDirector && !isVicePresident">
+                <form [formGroup]="formGroupDirector">
+                    <label htmlFor="department">Director </label>
+                    <p-dropdown
+                        formControlName="selectDirector"
+                        [options]="selectDirectorDropdown"
+                        optionLabel="fullname"
+                        placeholder="Select a Director"
+                    />
+                </form>
+            </div>
+            <div class="field">
+                <form [formGroup]="formGroupDemo">
+                    <label htmlFor="department">Department</label>
+                    <p-dropdown
+                        formControlName="selectDepartment"
+                        [options]="deptDropdownValue"
+                        optionLabel="name"
+                        [filter]="true"
+                        [showClear]="true"
+                        filterBy="name"
+                        placeholder="Search a Department"
+                    />
+                </form>
+            </div>
+
+            <div class="field">
+                <label htmlFor="department">Campus</label>
+                <form [formGroup]="formGroupCampus">
+                    <p-dropdown
+                        formControlName="selectedCampus"
+                        [options]="deptDropdownCampusValue"
+                        optionLabel="name"
+                        placeholder="Select a Campus"
+                    />
+                </form>
+            </div>
+
+            <div class="field footer-button-adduser">
+                <p-button
+                    label="Cancel"
+                    severity="secondary"
+                    (click)="addUserDialogCard = false"
+                />
+                &nbsp;&nbsp;
+                <p-button label="Save" (click)="addUserFunction(Addform)" />
+            </div>
+        </form>
+    </div>
+</p-dialog>

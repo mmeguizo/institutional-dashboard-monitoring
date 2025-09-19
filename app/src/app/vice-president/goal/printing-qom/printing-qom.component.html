@@ -1,0 +1,317 @@
+<p-dialog
+    header="Office Head"
+    [modal]="true"
+    [(visible)]="printingHead"
+    [style]="{ width: '25rem' }"
+>
+    <span class="p-text-secondary block mb-5">Prepared By:</span>
+    <div class="flex align-items-center gap-3 mb-3">
+        <label for="username" class="font-semibold w-6rem">Name</label>
+        <input
+            pInputText
+            #nameInput
+            id="name"
+            placeholder="e.g Benrie Nufable, PHD. TM"
+            class="flex-auto"
+            autocomplete="off"
+            [(ngModel)]="preparedByValue"
+        />
+    </div>
+    <div class="flex align-items-center gap-3 mb-5">
+        <label for="email" class="font-semibold w-6rem">Office</label>
+        <input
+            pInputText
+            id="office"
+            #officeInput
+            placeholder="e.g MIS Head - DPO"
+            class="flex-auto"
+            autocomplete="off"
+            [(ngModel)]="preparedByofficeValue"
+        />
+    </div>
+
+    <span class="p-text-secondary block mb-5">Counter Checked by:</span>
+    <div class="flex align-items-center gap-3 mb-3">
+        <label for="username" class="font-semibold w-6rem">Name</label>
+        <input
+            pInputText
+            #nameInput
+            id="name"
+            placeholder="e.g Yrika Marie R. Dusaran, PhD"
+            class="flex-auto"
+            autocomplete="off"
+            [(ngModel)]="counterCheckedValue"
+        />
+    </div>
+    <div class="flex align-items-center gap-3 mb-5">
+        <label for="email" class="font-semibold w-6rem">Office</label>
+        <input
+            pInputText
+            id="office"
+            #officeInput
+            placeholder="e.g Director for Quality Management"
+            class="flex-auto"
+            autocomplete="off"
+            [(ngModel)]="counterCheckedofficeValue"
+        />
+    </div>
+
+    <span class="p-text-secondary block mb-5">Verified By:</span>
+    <div class="flex align-items-center gap-3 mb-3">
+        <label for="username" class="font-semibold w-6rem">Name</label>
+        <input
+            pInputText
+            #nameInput
+            id="name"
+            placeholder="e.g Rosalinda S. Tuvilla"
+            class="flex-auto"
+            autocomplete="off"
+            [(ngModel)]="reviewedByValue"
+        />
+    </div>
+    <div class="flex align-items-center gap-3 mb-5">
+        <label for="email" class="font-semibold w-6rem">Office</label>
+        <input
+            pInputText
+            id="office"
+            #officeInput
+            placeholder="e.g Chief Adminstrative Officer - Admin"
+            class="flex-auto"
+            autocomplete="off"
+            [(ngModel)]="reviewedByofficeValue"
+        />
+    </div>
+
+    <!-- <span class="p-text-secondary block mb-5">Approved By:</span>
+    <div class="flex align-items-center gap-3 mb-3">
+        <label for="username" class="font-semibold w-6rem">Name</label>
+        <input
+            pInputText
+            #nameInput
+            id="name"
+            placeholder="e.g Rosalinda S. Tuvilla"
+            class="flex-auto"
+            autocomplete="off"
+            [(ngModel)]="verifiedByValue"
+        />
+    </div>
+    <div class="flex align-items-center gap-3 mb-5">
+        <label for="email" class="font-semibold w-6rem">Office</label>
+        <input
+            pInputText
+            id="office"
+            #officeInput
+            placeholder="e.g Chief Adminstrative Officer - Admin"
+            class="flex-auto"
+            autocomplete="off"
+            [(ngModel)]="verifiedByofficeValue"
+        />
+    </div> -->
+
+    <div class="flex justify-content-end gap-2">
+        <p-button
+            label="Cancel"
+            severity="secondary"
+            (onClick)="printingHead = false"
+        />
+        <p-button label="Save" (onClick)="printPdf(); printingHead = false" />
+    </div>
+</p-dialog>
+
+<table id="printQom" [ngClass]="{ hidden: !isPrintableVisible }">
+    <thead>
+        <tr class="font-condensed">
+            <th rowspan="2" style="width: 10%">Indicators</th>
+            <th rowspan="2" style="width: 7%">Target & Target Date</th>
+            <th colspan="12">Performance</th>
+            <th rowspan="2" style="width: 6%">Overall Result</th>
+            <th rowspan="2" style="width: 8%">MOV/Data Source</th>
+            <th rowspan="2" style="width: 22%">Remarks</th>
+        </tr>
+        <tr class="font-condensed">
+            <th>Jan.</th>
+            <th>Feb.</th>
+            <th>Mar.</th>
+            <th>Apr.</th>
+            <th>May</th>
+            <th>June</th>
+            <th>July</th>
+            <th>Aug.</th>
+            <th>Sep.</th>
+            <th>Oct.</th>
+            <th>Nov.</th>
+            <th>Dec.</th>
+        </tr>
+        <tr>
+            <th class="border-x-0" colspan="17"></th>
+        </tr>
+    </thead>
+    <tbody *ngIf="objectiveDatas?.length != 0">
+        <tr *ngFor="let obj of objectiveDatas; let i = index">
+            <td>{{ obj.performance_indicator | titlecase }}</td>
+            <td>{{ obj.total }}</td>
+            <td>
+                @if( obj.monthPointer === 0){
+                {{ obj.monthPointerValue.monthPointer_0 }}
+                } @else { 0 }
+            </td>
+            <td>
+                @if( obj.monthPointer === 1){
+                {{ obj.monthPointerValue.monthPointer_1 }}
+                }@else { 0 }
+            </td>
+            <td>
+                @if( obj.monthPointer === 2){
+                {{ obj.monthPointerValue.monthPointer_2 }}
+                }@else { 0 }
+            </td>
+            <td>
+                @if( obj.monthPointer === 3){
+                {{ obj.monthPointerValue.monthPointer_3 }}
+                }@else { 0 }
+            </td>
+            <td>
+                @if( obj.monthPointer === 4){
+                {{ obj.monthPointerValue.monthPointer_4 }}
+                }@else { 0 }
+            </td>
+            <td>
+                @if( obj.monthPointer === 5){
+                {{ obj.monthPointerValue.monthPointer_5 }}
+                }@else { 0 }
+            </td>
+            <td>
+                @if( obj.monthPointer === 6){
+                {{ obj.monthPointerValue.monthPointer_6 }}
+                }@else { 0 }
+            </td>
+            <td>
+                @if( obj.monthPointer === 7){
+                {{ obj.monthPointerValue.monthPointer_7 }}
+                }@else { 0 }
+            </td>
+            <td>
+                @if( obj.monthPointer === 8){
+                {{ obj.monthPointerValue.monthPointer_8 }}
+                }@else { 0 }
+            </td>
+            <td>
+                @if( obj.monthPointer === 9){
+                {{ obj.monthPointerValue.monthPointer_9 }}
+                }@else { 0 }
+            </td>
+            <td>
+                @if( obj.monthPointer === 10){
+                {{ obj.monthPointerValue.monthPointer_10 }}
+                }@else { 0 }
+            </td>
+            <td>
+                @if( obj.monthPointer === 11){
+                {{ obj.monthPointerValue.monthPointer_11 }}
+                }@else { 0 }
+            </td>
+            <td>
+                {{ obj.total + "/" + obj.target }} @if(obj.target !==
+                obj.total){ Ongoing} @else { Done}
+            </td>
+            <td>{{ obj.data_source }}</td>
+            <td>
+                @for(rem of obj.remarks; track rem._id){
+                <br />
+                <p>{{ rem.remarks }}</p>
+                }
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<!--
+
+
+
+          <tr>
+            <td># of software systems developed</td>
+            <td>2</td>
+            <td></td>
+            <td></td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>2 of 2</td>
+            <td>PPMP / Software System Inventory / Completion Report</td>
+            <td>
+              <p>Inhouse Development</p>
+              <p>Admission System</p>
+              <p>Online Grading System</p>
+            </td>
+          </tr>
+          <tr>
+            <td># of current systems deployed / migrated / upgraded</td>
+            <td>3</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>1</td>
+            <td>1</td>
+            <td>1 of 3 Ongoing</td>
+            <td>PPMP / Software System Inventory / Completion Report</td>
+            <td>
+              <p>(HR System)<br />DTR/Payroll</p>
+              <p>Enrollment</p>
+              <p>Digital Dashboard</p>
+            </td>
+          </tr>
+          <tr>
+            <td># of Software evaluated for security and performance</td>
+            <td>3</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+            <td>1</td>
+            <td>1 of 3 Ongoing</td>
+            <td>Software Maintenance / Evaluation Reports</td>
+            <td><p>System Security Evaluation</p></td>
+          </tr>
+          <tr>
+            <td>Number of Submitted ICT Policies and manual of operation</td>
+            <td>2</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>1</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>1</td>
+            <td>1 of 2 Ongoing</td>
+            <td>Forms / Policies / Manual</td>
+            <td><p>Data Privacy Manual / Office Policies</p></td>
+          </tr>
+
+-->

@@ -1,0 +1,189 @@
+// body {
+//     width: 11in;
+//     height: 8.5in;
+// }
+
+// @media print {
+//     body {
+//         padding: unset;
+//         width: unset;
+//         height: unset;
+//         -webkit-print-color-adjust: exact; /* Enable background graphics */
+//         print-color-adjust: exact; /* Enable background graphics */
+//         margin: 1.5in 0in 0in 0in;
+//     }
+//     @page {
+//         size: landscape; /* Set layout to landscape */
+//     }
+// }
+
+// table {
+//     border-collapse: collapse;
+//     width: 100%;
+// }
+
+// table:not(:is(.nested-table)) {
+//     border-top: 1px solid;
+//     border-left: 1px solid;
+//     table-layout: fixed;
+// }
+
+// table :is(th, td) {
+//     padding: 4px 6px;
+//     border-right: 1px solid;
+//     border-bottom: 1px solid;
+// }
+
+// .nested-table {
+//     tr {
+//         td {
+//             font-weight: 600;
+//             &[rowspan="4"] {
+//                 border-bottom: 0;
+//             }
+//             &:last-child {
+//                 border-right: 0;
+//             }
+//         }
+//         &:last-child {
+//             td {
+//                 &:last-child {
+//                     border-bottom: 0;
+//                 }
+//             }
+//         }
+//     }
+// }
+
+// .logo {
+//     border-right: 0;
+//     img {
+//         width: 80px;
+//         height: 80px;
+//         margin-left: auto;
+//         display: block;
+//     }
+//     & + td {
+//         & > div {
+//             display: flex;
+//             flex-direction: column;
+//             justify-content: center;
+//             align-items: center;
+//             > h1 {
+//                 font-size: 26px;
+//             }
+//             > h5 {
+//                 color: #064f7c;
+//             }
+//             > hr {
+//                 margin-top: 8px;
+//                 width: 80%;
+//                 border: 1px solid;
+//             }
+//         }
+//     }
+// }
+
+// tr.font-condensed {
+//     & > th {
+//         font-size: 18px;
+//         padding: 8px 6px;
+//         &:first-child {
+//             background-color: #f57e3a;
+//         }
+//         &:nth-child(2) {
+//             background-color: #057a40;
+//         }
+//         &:last-child {
+//             background-color: #efdf10;
+//         }
+//     }
+//     & + tr {
+//         & > th {
+//             padding: 8px;
+//         }
+//         & + tr {
+//             & > th {
+//                 padding: 0px 4px;
+//                 font-stretch: condensed;
+//                 font-size: 16px;
+//             }
+//             & + tr {
+//                 & > th {
+//                     padding: 2px;
+//                 }
+//             }
+//         }
+//     }
+// }
+
+// tbody.data-cells {
+//     font-stretch: condensed;
+//     & tr {
+//         & > td {
+//             height: 0;
+//             & > div {
+//                 height: 100%;
+//                 display: flex;
+//                 flex-direction: column;
+//                 gap: 1rem;
+//                 justify-content: space-evenly;
+//                 text-align: center;
+//                 & p {
+//                     font-size: 14px;
+//                 }
+//             }
+//         }
+//     }
+// }
+
+// tfoot {
+//     font-stretch: condensed;
+//     & tr td {
+//         padding: 0;
+//         & > div {
+//             display: grid;
+//             grid-template-columns: repeat(3, 1fr);
+//             & > div {
+//                 &:not(:last-child) {
+//                     border-right: 1px solid;
+//                 }
+//                 & > div {
+//                     font-size: 14px;
+//                     padding: 3px 6px;
+//                     &:not(:last-child) {
+//                         border-bottom: 1px solid;
+//                     }
+//                     &:nth-child(2) {
+//                         text-align: center;
+//                         font-size: 16px;
+//                         padding-top: 32px;
+//                         font-weight: 600;
+//                         padding-bottom: 0px;
+//                     }
+//                     &:last-child {
+//                         text-align: center;
+//                         font-size: 14px;
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// }
+
+// .p-0 {
+//     padding: 0px;
+// }
+
+// .text-align-end {
+//     text-align: end;
+// }
+
+// .border-x-0 {
+//     border-left: 1px solid white;
+//     border-right: 1px solid white;
+// }
+
+// .font-condensed {
+//     font-stretch: condensed;
+// }

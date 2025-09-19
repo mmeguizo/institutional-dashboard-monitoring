@@ -1,0 +1,136 @@
+<p-dialog
+    header="Add Goal"
+    [(visible)]="addGoalDialogCard"
+    [style]="{ width: '25rem' }"
+    (onHide)="onHide()"
+>
+    <div class="p-fluid">
+        <div class="field col-10 md:col-10">
+            <form [formGroup]="addGoalform">
+                <div class="field">
+                    <label htmlFor="department">Goal name</label>
+                    <p-dropdown
+                        formControlName="goals"
+                        [options]="deptDropdownGoalListValue"
+                        optionLabel="name"
+                        placeholder="Select a Goal"
+                        [editable]="false"
+                        (onChange)="onGoalChange($event)"
+                    />
+                </div>
+                <div class="field">
+                    <label htmlFor="department">Strategic Objectives</label>
+                    <p-dropdown
+                        formControlName="strategic_objective"
+                        [options]="strategicObjectiveList"
+                        optionLabel="name"
+                        placeholder="Select a Strategic Objectives"
+                        [editable]="false"
+                    />
+                </div>
+
+                <div class="field">
+                    <label htmlFor="department">Department</label>
+                    <form [formGroup]="formGroupDemo">
+                        <p-dropdown
+                            formControlName="selectDepartment"
+                            [options]="deptDropdownValue"
+                            [filter]="true"
+                            [showClear]="true"
+                            filterBy="name"
+                            optionLabel="name"
+                            placeholder="Select a Department"
+                        />
+                    </form>
+                </div>
+                <div class="field">
+                    <label htmlFor="department">Campus</label>
+                    <form [formGroup]="formGroupCampus">
+                        <p-dropdown
+                            formControlName="selectedCampus"
+                            [options]="deptDropdownCampusValue"
+                            optionLabel="name"
+                            placeholder="Select a Campus"
+                        />
+                    </form>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="flex justify-space-between gap-2">
+        <p-button
+            label="Cancel"
+            severity="secondary"
+            (click)="addGoalDialogCard = false"
+        />
+        <p-button label="Save" (click)="addGoalDialogExec(addGoalform)" />
+    </div>
+</p-dialog>
+
+<!-- <p-dialog
+    header="Add Goal"
+    [(visible)]="addGoalDialogCard"
+    [style]="{ width: '25rem' }"
+    (onHide)="onHide()"
+>
+    <div class="p-fluid">
+        <div class="field col-10 md:col-10 ">
+            <form [formGroup]="addGoalform">
+                <div class="field">
+                    <label htmlFor="department">Goal name</label>
+                    <p-dropdown
+                        formControlName="goals"
+                        [options]="deptDropdownGoalListValue"
+                        optionLabel="name"
+                        placeholder="Select a Goal"
+                        [(ngModel)]="customGoalName"
+                        [editable]="false"
+                        (onChange)="onGoalChange($event)"
+                    />
+                </div>
+                <div class="field">
+                    <label htmlFor="name1">Budget</label>
+                    <p-inputNumber
+                        mode="decimal"
+                        [showButtons]="true"
+                        formControlName="budget"
+                    >
+                    </p-inputNumber>
+                </div>
+                <div class="field">
+                    <label htmlFor="department">Department</label>
+                    <form [formGroup]="formGroupDemo">
+                        <p-dropdown
+                            formControlName="selectDepartment"
+                            [options]="deptDropdownValue"
+                            optionLabel="name"
+                            [filter]="true"
+                            [showClear]="true"
+                            filterBy="name"
+                            placeholder="Select a Department"
+                        />
+                    </form>
+                </div>
+                <div class="field">
+                    <label htmlFor="department">Campus</label>
+                    <form [formGroup]="formGroupCampus">
+                        <p-dropdown
+                            formControlName="selectedCampus"
+                            [options]="deptDropdownCampusValue"
+                            optionLabel="name"
+                            placeholder="Select a Campus"
+                        />
+                    </form>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="flex justify-space-between gap-2">
+        <p-button
+            label="Cancel"
+            severity="secondary"
+            (click)="addGoalDialogCard = false"
+        />
+        <p-button label="Save" (click)="addGoalDialogExec(addGoalform)" />
+    </div>
+</p-dialog> -->

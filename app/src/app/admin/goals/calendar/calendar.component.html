@@ -1,0 +1,72 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card">
+            <div class="add-user-heading">
+                <span class="text-xl font-medium mt-2 text-slate-950"
+                    >Calendar</span
+                >
+                <div class="demo-app">
+                    <div class="demo-app-sidebar">
+                        <!-- <div class="demo-app-sidebar-section">
+                            <h2>Instructions</h2>
+                            <ul>
+                                <li>
+                                    Select dates and you will be prompted to
+                                    create a new event
+                                </li>
+                                <li>Drag, drop, and resize events</li>
+                                <li>Click an event to delete it</li>
+                            </ul>
+                        </div>
+                        <div class="demo-app-sidebar-section">
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    [checked]="calendarVisible()"
+                                    (change)="handleCalendarToggle()"
+                                />
+                                toggle whole calendar
+                            </label>
+                        </div>
+                        <div class="demo-app-sidebar-section">
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    [checked]="calendarOptions().weekends"
+                                    (change)="handleWeekendsToggle()"
+                                />
+                                toggle weekends
+                            </label>
+                        </div> -->
+                        <div class="demo-app-sidebar-section">
+                            <h2>All Events ({{ currentEvents().length }})</h2>
+                            <ul
+                                *ngFor="
+                                    let event of currentEvents();
+                                    let i = index
+                                "
+                            >
+                                <li>{{ i + 1 }} - {{ event.title }}</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="demo-app-main">
+                        <full-calendar
+                            *ngIf="calendarVisible()"
+                            [options]="calendarOptions()"
+                        >
+                            <ng-template #eventContent let-arg>
+                                <i> {{ arg.event.image_url }} </i>
+                                <i
+                                    >{{ arg.event.extendedProps.user }} -
+                                    {{ arg.event.title }}</i
+                                >
+                            </ng-template>
+                        </full-calendar>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

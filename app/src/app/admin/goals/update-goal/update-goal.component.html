@@ -1,0 +1,74 @@
+<p-dialog
+    header="Update Goal"
+    [(visible)]="updateGoalDialogCard"
+    [style]="{ width: '25rem' }"
+>
+    <div class="p-fluid">
+        <div class="field col-10 md:col-10">
+            <form [formGroup]="updateGoalform">
+                <div class="field">
+                    <label htmlFor="name1">Goals name</label>
+                    <input
+                        pInputText
+                        id="goals"
+                        class="flex-auto"
+                        autocomplete="off"
+                        formControlName="goals"
+                        pTooltip="Edit not allowed due to Objective values present"
+                        tooltipPosition="top"
+                    />
+                    <!-- [ngClass]="
+                            updateGoalform?.get('goals').touched &&
+                            updateGoalform?.controls['goals'].errors?.required
+                                ? 'ng-invalid ng-dirty'
+                                : ''
+                        " -->
+                </div>
+                <div class="field">
+                    <label htmlFor="name1">Budget</label>
+                    <p-inputNumber
+                        mode="decimal"
+                        [showButtons]="true"
+                        formControlName="budget"
+                    >
+                    </p-inputNumber>
+                </div>
+                <div class="field">
+                    <label htmlFor="department">Department</label>
+                    <form [formGroup]="formGroupDemo">
+                        <p-dropdown
+                            formControlName="selectDepartment"
+                            [options]="deptDropdownValue"
+                            optionLabel="name"
+                            placeholder="Select a Department"
+                            [filter]="true"
+                            [showClear]="true"
+                            filterBy="name"
+                            optionLabel="name"
+                            placeholder="Select a Department"
+                        />
+                    </form>
+                </div>
+                <div class="field">
+                    <label htmlFor="department">Campus</label>
+                    <form [formGroup]="formGroupCampus">
+                        <p-dropdown
+                            formControlName="selectedCampus"
+                            [options]="deptDropdownCampusValue"
+                            optionLabel="name"
+                            placeholder="Select a Campus"
+                        />
+                    </form>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="flex justify-space-between gap-2">
+        <p-button
+            label="Cancel"
+            severity="secondary"
+            (click)="updateGoalDialogCard = false"
+        />
+        <p-button label="Save" (click)="updateGoalDialogExec(updateGoalform)" />
+    </div>
+</p-dialog>

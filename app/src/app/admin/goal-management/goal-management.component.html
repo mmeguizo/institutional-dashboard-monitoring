@@ -1,0 +1,24 @@
+<div class="col-12">
+    <div class="card">
+        <h5>Goal Manager</h5>
+        <div class="grid">
+            <app-add-goal
+                [addGoalMessageResults]="addGoalMessageResultsPost"
+                [editGoalNameData]="editGoalNameDataParent"
+                (addGoalEvent)="addGoalEvent($event)"
+                class="col-5 flex align-items-center justify-content-center"
+            ></app-add-goal>
+            <div class="col-1">
+                <p-divider layout="vertical">
+                    <b>OR</b>
+                </p-divider>
+            </div>
+            <div class="col-6 align-items-center justify-content-center">
+                <app-goal-table
+                    [newGoalDataFromParent]="newGoalData"
+                    (editGoalName)="editGoalName($event)"
+                ></app-goal-table>
+            </div>
+        </div>
+    </div>
+</div>

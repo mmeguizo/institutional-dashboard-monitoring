@@ -1,0 +1,270 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card">
+            <div class="add-user-heading">
+                <span class="text-xl font-medium mt-2 text-slate-950"
+                    >Users</span
+                >
+                <button
+                    (click)="addUserDialogButton()"
+                    pButton
+                    icon="pi pi-user-plus"
+                    label="Add User"
+                ></button>
+
+                <!-- add user dialog -->
+            </div>
+            <p-table
+                #dt1
+                [value]="users"
+                dataKey="id"
+                [rows]="10"
+                [loading]="loading"
+                [rowHover]="true"
+                styleClass="p-datatable-gridlines"
+                [paginator]="true"
+                [globalFilterFields]="[
+                    'username',
+                    'email',
+                    'department',
+                    'role',
+                    'campus',
+                    'status',
+                    'options'
+                ]"
+                responsiveLayout="scroll"
+            >
+                <ng-template pTemplate="caption">
+                    <div
+                        class="flex justify-content-between flex-column sm:flex-row"
+                    >
+                        <button
+                            pButton
+                            label="Clear"
+                            class="p-button-outlined mb-2"
+                            icon="pi pi-filter-slash"
+                            (click)="clear(dt1)"
+                        ></button>
+                        <span class="p-input-icon-left mb-2">
+                            <i class="pi pi-search"></i>
+                            <input
+                                pInputText
+                                type="text"
+                                #filter
+                                (input)="onGlobalFilter(dt1, $event)"
+                                placeholder="Search Keyword"
+                                class="p-inputtext p-component p-element w-full"
+                            />
+                        </span>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Username
+                                <p-columnFilter
+                                    type="text"
+                                    field="username"
+                                    display="menu"
+                                    placeholder="Search by Username"
+                                ></p-columnFilter>
+                            </div>
+                        </th>
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Email
+                                <p-columnFilter
+                                    type="text"
+                                    field="email"
+                                    display="menu"
+                                    placeholder="Search by Email"
+                                ></p-columnFilter>
+                            </div>
+                        </th>
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Department
+                                <p-columnFilter
+                                    type="text"
+                                    field="department"
+                                    display="menu"
+                                    placeholder="Search by Department"
+                                ></p-columnFilter>
+                            </div>
+                        </th>
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Role
+                                <p-columnFilter
+                                    type="text"
+                                    field="role"
+                                    display="menu"
+                                    placeholder="Search by Role"
+                                ></p-columnFilter>
+                            </div>
+                        </th>
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Campus
+                                <p-columnFilter
+                                    type="text"
+                                    field="campus"
+                                    display="menu"
+                                    placeholder="Search by Campus"
+                                ></p-columnFilter>
+                            </div>
+                        </th>
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Status
+                                <p-columnFilter
+                                    type="text"
+                                    field="status"
+                                    display="menu"
+                                    placeholder="Search by Status"
+                                ></p-columnFilter>
+                            </div>
+                        </th>
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Options
+                            </div>
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-user>
+                    <tr>
+                        <td>
+                            <!-- {{ user.username | titlecase }} -->
+                            <p-chip
+                            label="{{
+                                user.firstname ? (user.firstname | titlecase)  : ('no firstname' | titlecase )
+                            }}"
+                            [image]="
+                                user.profile_pic ? (this.auth.domain + '/images/' + user.profile_pic) : (this.auth.domain + '/images/no-photo.png')
+                            "
+                            styleClass="m-1"
+                        ></p-chip>
+                        </td>
+                        <td>
+                            {{ user.email }}
+                        </td>
+                        <td>
+                            {{ user.department | titlecase }}
+                        </td>
+                        <td>
+                            {{ user.role | titlecase }}
+                        </td>
+                        <td>
+                            {{ user.campus | titlecase }}
+                        </td>
+                        <td>
+                            <span
+                                (click)="changeUserStatus(user.id)"
+                                [class]="
+                                    'cursor-pointer  customer-badge status-' +
+                                    user.status
+                                "
+                                >{{ user.status }}</span
+                            >
+                        </td>
+                        <td>
+                            <div class="options-users">
+                                <i
+                                    (click)="updateUser(user)"
+                                    class="pi pi-user-edit text-xl"
+                                    style="color: #0ea5e9; cursor: pointer"
+                                ></i>
+                                <i
+                                    (click)="deleteUser(user.id)"
+                                    class="pi pi-trash text-xl"
+                                    style="color: #ef4444; cursor: pointer"
+                                ></i>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage">
+                    <tr>
+                        <td colspan="8">No Users found.</td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="loadingbody">
+                    <tr>
+                        <td colspan="8">Loading Users data. Please wait.</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+</div>
+
+<!-- change status dialog-->
+
+<p-dialog
+    header="Change User"
+    id="tester"
+    [(visible)]="changeStatusCard"
+    showEffect="fade"
+    [style]="{ width: '20vw' }"
+    [breakpoints]="{ '960px': '50vw' }"
+>
+    <p class="line-height-3 m-0">Change Users Status</p>
+    <ng-template pTemplate="footer">
+        <button
+            pButton
+            icon="pi pi-check"
+            (click)="changeUserStatuExecution()"
+            label="Ok"
+            class="p-button-outlined"
+        ></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog
+    header="Dialog"
+    id="tester"
+    [(visible)]="deleteUserCard"
+    showEffect="fade"
+    [style]="{ width: '20vw' }"
+    [breakpoints]="{ '960px': '50vw' }"
+>
+    <p class="line-height-3 m-0">Delete User?</p>
+    <ng-template pTemplate="footer">
+        <button
+            pButton
+            icon="pi pi-check"
+            (click)="deleteUserExec()"
+            label="Ok"
+            class="p-button-outlined"
+        ></button>
+    </ng-template>
+</p-dialog>
+
+<!-- edit user card -->
+<app-edit-user
+    [updateUser]="parentUpdateUser"
+    (childEditUserEvent)="receivedEditUserEvent($event)"
+></app-edit-user>
+
+<!-- add user dialog -->
+<app-add-user
+    [addNewUser]="parentAddNewUser"
+    (childAddUserEvent)="receivedAddUserEvent($event)"
+>
+</app-add-user>

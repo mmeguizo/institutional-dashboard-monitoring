@@ -1,0 +1,17 @@
+# Use a base image for building Angular applications
+FROM nginx:alpine
+
+# Create a directory for your app
+RUN mkdir /usr/share/nginx/html
+
+# Copy your Angular application files
+COPY app/dist/ /usr/share/nginx/html
+
+# Expose port (replace 80 with your actual port if needed)
+EXPOSE 80
+
+# Configure Nginx to serve the application
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Start Nginx
+CMD [ "nginx", "-g", "daemon off;" ]

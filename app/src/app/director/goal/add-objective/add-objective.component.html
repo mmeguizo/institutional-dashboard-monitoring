@@ -1,0 +1,329 @@
+<p-dialog
+    styleClass="addObjective"
+    header="Add Objectives"
+    [(visible)]="addObjectiveGoalDialogCard"
+    [style]="{ width: '50rem' }"
+    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+    position="top"
+    (onHide)="clearAddObjectiveGoalDialogCardDatas()"
+>
+    <div class="p-fluid">
+        <div class="field col-10 md:col-10">
+            <form [formGroup]="addObjectiveGoalform">
+                <div class="field">
+                    <label htmlFor="department">Strategic Objective</label>
+                    <input
+                        pInputText
+                        id="strategic_objective"
+                        class="flex-auto"
+                        autocomplete="off"
+                        [ngClass]="
+                            addObjectiveGoalform?.get('strategic_objective')
+                                ?.touched &&
+                            addObjectiveGoalform?.controls[
+                                'strategic_objective'
+                            ].errors?.required
+                                ? 'ng-invalid ng-dirty'
+                                : ''
+                        "
+                        formControlName="strategic_objective"
+                        required
+                    />
+                </div>
+                <div class="field">
+                    <label htmlFor="department">Functional Objective</label>
+                    <textarea
+                        rows="5"
+                        cols="30"
+                        placeholder="Message..."
+                        [ngClass]="
+                            addObjectiveGoalform?.get('functional_objective')
+                                ?.touched &&
+                            addObjectiveGoalform?.controls[
+                                'functional_objective'
+                            ].errors?.required
+                                ? 'ng-invalid ng-dirty'
+                                : ''
+                        "
+                        formControlName="functional_objective"
+                        required
+                        pInputTextarea
+                    ></textarea>
+                </div>
+                <div class="field">
+                    <label htmlFor="name1">Performance Indicator</label>
+                    <textarea
+                        rows="5"
+                        cols="30"
+                        placeholder="Message..."
+                        [ngClass]="
+                            addObjectiveGoalform?.get('performance_indicator')
+                                ?.touched &&
+                            addObjectiveGoalform?.controls[
+                                'performance_indicator'
+                            ].errors?.required
+                                ? 'ng-invalid ng-dirty'
+                                : ''
+                        "
+                        formControlName="performance_indicator"
+                        required
+                        pInputTextarea
+                    ></textarea>
+                </div>
+                <div class="field">
+                    <label htmlFor="name1">Target</label>
+                    <p-inputNumber
+                        mode="decimal"
+                        [showButtons]="true"
+                        [ngClass]="
+                            addObjectiveGoalform?.get('target').touched &&
+                            addObjectiveGoalform?.controls['target'].errors
+                                ?.required
+                                ? 'ng-invalid ng-dirty'
+                                : ''
+                        "
+                        formControlName="target"
+                    >
+                    </p-inputNumber>
+                    <div
+                        class="flex flex-row align-items-center justify-content-evenly mt-2"
+                    >
+                        <div class="card flex justify-content-between">
+                            <div class="flex flex-row gap-3">
+                                <div
+                                    *ngFor="let category of targetTypes"
+                                    class="field-checkbox"
+                                >
+                                    <p-radioButton
+                                        [inputId]="category.key"
+                                        name="target_type"
+                                        [value]="category.name"
+                                        formControlName="target_type"
+                                    />
+                                    <label [for]="category.key" class="ml-2">
+                                        {{ category.name }}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <label htmlFor="name1">Formula</label>
+                    <textarea
+                        rows="5"
+                        cols="30"
+                        placeholder="Message..."
+                        [ngClass]="
+                            addObjectiveGoalform?.get('formula')?.touched &&
+                            addObjectiveGoalform?.controls['formula'].errors
+                                ?.required
+                                ? 'ng-invalid ng-dirty'
+                                : ''
+                        "
+                        formControlName="formula"
+                        required
+                        pInputTextarea
+                    ></textarea>
+                </div>
+                <div class="field">
+                    <label htmlFor="name1">Programs</label>
+                    <textarea
+                        rows="5"
+                        cols="30"
+                        placeholder="Message..."
+                        [ngClass]="
+                            addObjectiveGoalform?.get('programs')?.touched &&
+                            addObjectiveGoalform?.controls['programs'].errors
+                                ?.required
+                                ? 'ng-invalid ng-dirty'
+                                : ''
+                        "
+                        formControlName="programs"
+                        required
+                        pInputTextarea
+                    ></textarea>
+                </div>
+                <div class="field">
+                    <label htmlFor="name1">Responsible Persons</label>
+                    <input
+                        pInputText
+                        id="responsible_persons"
+                        class="flex-auto"
+                        autocomplete="off"
+                        [ngClass]="
+                            addObjectiveGoalform?.get('responsible_persons')
+                                ?.touched &&
+                            addObjectiveGoalform?.controls[
+                                'responsible_persons'
+                            ].errors?.required
+                                ? 'ng-invalid ng-dirty'
+                                : ''
+                        "
+                        formControlName="responsible_persons"
+                        required
+                    />
+                </div>
+                <div class="field">
+                    <label htmlFor="department">Frequency Monitoring</label>
+                    <p-dropdown
+                        formControlName="frequency_monitoring"
+                        [options]="frequencyOptions"
+                        optionLabel="name"
+                        placeholder="Select a Frequency"
+                        (onChange)="onFrequencyChange($event)"
+                    ></p-dropdown>
+                    <div
+                        class="flex flex-row align-items-center justify-content-evenly"
+                    >
+                        <div class="card flex justify-content-between">
+                            <div class="flex flex-row gap-3">
+                                <div
+                                    *ngFor="let category of typeOfComputations"
+                                    class="field-checkbox"
+                                >
+                                    <p-radioButton
+                                        [inputId]="category.key"
+                                        name="type_of_computation"
+                                        [value]="category.name"
+                                        formControlName="type_of_computation"
+                                    />
+                                    <label [for]="category.key" class="ml-2">
+                                        {{ category.name }}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    *ngIf="
+                        addObjectiveGoalform.get('frequency_monitoring')
+                            .value === 'monthly'
+                    "
+                >
+                    <div class="grid">
+                        <div
+                            class="col-3"
+                            *ngFor="let month of months; let i = index"
+                        >
+                            <label for="month_{{ i }}"
+                                >Goal For the {{ month }}</label
+                            >
+                            <p-inputNumber
+                                id="month_{{ i }}"
+                                formControlName="month_{{ i }}"
+                            ></p-inputNumber>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    *ngIf="
+                        addObjectiveGoalform.get('frequency_monitoring')
+                            .value === 'yearly'
+                    "
+                >
+                    <div class="grid">
+                        <div class="col-3">
+                            <label for="yearly_{{ 0 }}"
+                                >Goal For the Year</label
+                            >
+                            <p-inputNumber
+                                id="yearly_{{ 0 }}"
+                                formControlName="yearly_{{ 0 }}"
+                            ></p-inputNumber>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    *ngIf="
+                        addObjectiveGoalform.get('frequency_monitoring')
+                            .value === 'quarterly'
+                    "
+                >
+                    <div class="grid">
+                        <div
+                            class="col-4"
+                            *ngFor="let quarter of quarters; let i = index"
+                        >
+                            <label for="quarter_{{ i }}"
+                                >Goal For the {{ quarter }}</label
+                            >
+                            <p-inputNumber
+                                id="quarter_{{ i }}"
+                                formControlName="quarter_{{ i }}"
+                            ></p-inputNumber>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    *ngIf="
+                        addObjectiveGoalform.get('frequency_monitoring')
+                            .value === 'semi_annual'
+                    "
+                >
+                    <div class="grid">
+                        <div
+                            class="col-6"
+                            *ngFor="let period of semi_annual; let i = index"
+                        >
+                            <label for="semi_annual_{{ i }}"
+                                >Goal For the {{ period }}</label
+                            >
+                            <p-inputNumber
+                                id="semi_annual_{{ i }}"
+                                formControlName="semi_annual_{{ i }}"
+                            ></p-inputNumber>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label htmlFor="name1"
+                        >Means of Verification(Data Source)</label
+                    >
+                    <input
+                        pInputText
+                        id="data_source"
+                        class="flex-auto"
+                        autocomplete="off"
+                        [ngClass]="
+                            addObjectiveGoalform?.get('data_source').touched &&
+                            addObjectiveGoalform?.controls['data_source'].errors
+                                ?.required
+                                ? 'ng-invalid ng-dirty'
+                                : ''
+                        "
+                        formControlName="data_source"
+                        required
+                    />
+                </div>
+                <div class="field">
+                    <label htmlFor="name1"> budget </label>
+                    <p-inputNumber
+                        mode="decimal"
+                        formControlName="budget"
+                        [showButtons]="true"
+                    >
+                    </p-inputNumber>
+                </div>
+                <div class="flex justify-space-between gap-2">
+                    <p-button
+                        label="Cancel"
+                        severity="secondary"
+                        (click)="clearAddObjectiveGoalDialogCardDatas()"
+                    ></p-button>
+                    <p-button
+                        label="Save"
+                        (click)="
+                            addSubObjectiveGoalDialogExec(addObjectiveGoalform)
+                        "
+                    ></p-button>
+                </div>
+            </form>
+        </div>
+    </div>
+</p-dialog>

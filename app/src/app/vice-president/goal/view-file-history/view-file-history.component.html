@@ -1,0 +1,181 @@
+<p-dialog
+    [header]="'File HistoryList'"
+    [(visible)]="viewObjectiveFileHistoryDialogCard"
+    [style]="{ width: '60rem' }"
+    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+    [maximizable]="true"
+    responsiveLayout="stack"
+    [closable]="false"
+    position="top"
+>
+    {{ loading }}
+    <div class="grid">
+        <div class="col-12">
+            <p-table
+                #dt3
+                [value]="AllObjectivesHistoryFiles"
+                dataKey="id"
+                [rows]="5"
+                [loading]="loading"
+                [rowHover]="true"
+                styleClass="p-datatable-gridlines"
+                [paginator]="true"
+                [globalFilterFields]="['name', 'code', 'options']"
+                responsiveLayout="scroll"
+                [tableStyle]="{ 'min-width': '50rem' }"
+            >
+                <ng-template pTemplate="caption">
+                    <div
+                        class="flex justify-content-between flex-column sm:flex-row"
+                    >
+                        <button
+                            pButton
+                            label="Clear"
+                            class="p-button-outlined mb-2"
+                            icon="pi pi-filter-slash"
+                            (click)="clear(dt3)"
+                        ></button>
+
+                        <!-- <p-button
+                            [disabled]="blockedPanel"
+                            icon="pi pi-upload"
+                            (click)="addFiles()"
+                            severity="success"
+                            [outlined]="true"
+                            pTooltip="Add Objectives"
+                            tooltipPosition="top"
+                        /> -->
+
+                        <span class="p-input-icon-left mb-2">
+                            <i class="pi pi-search"></i>
+                            <input
+                                pInputText
+                                type="text"
+                                #filter
+                                (input)="onGlobalFilter(dt3, $event)"
+                                placeholder="Search Keyword"
+                                class="p-inputtext p-component p-element w-full"
+                            />
+                        </span>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                File
+                            </div>
+                        </th>
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Date Added
+                            </div>
+                        </th>
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Date Deleted
+                            </div>
+                        </th>
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Status
+                            </div>
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-AllObjectivesHistoryFiles>
+                    <tr>
+                        <td>
+                            <!-- {{ AllObjectivesHistoryFiles.source }}
+                            {{ this.auth.domain + "/images/files/" }} -->
+                            <a
+                                [href]="
+                                    auth.domain +
+                                    '/images/files/' +
+                                    AllObjectivesHistoryFiles.source
+                                "
+                                target="_blank"
+                            >
+                                <i
+                                    class="text-4xl"
+                                    [ngClass]="
+                                        getIcon(
+                                            AllObjectivesHistoryFiles.source
+                                                .split('.')
+                                                .pop()
+                                                .toLowerCase()
+                                        )
+                                    "
+                                ></i>
+                            </a>
+                        </td>
+                        <td>
+                            {{
+                                AllObjectivesHistoryFiles.date_added
+                                    | date : "short"
+                            }}
+                        </td>
+                        <td>
+                            <span
+                                [class]="
+                                    'cursor-pointer  customer-badge status-' +
+                                    (AllObjectivesHistoryFiles.status
+                                        ? 'active'
+                                        : 'inactive')
+                                "
+                            >
+                                {{
+                                    AllObjectivesHistoryFiles.updatedAt
+                                        | date : "medium"
+                                }}</span
+                            >
+                        </td>
+                        <td>
+                            <span
+                                [class]="
+                                    'cursor-pointer  customer-badge status-' +
+                                    (AllObjectivesHistoryFiles.status
+                                        ? 'active'
+                                        : 'inactive')
+                                "
+                                >{{
+                                    AllObjectivesHistoryFiles.status
+                                        ? "Active"
+                                        : "Deleted"
+                                }}</span
+                            >
+                        </td>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="emptymessage">
+                    <tr>
+                        <td colspan="8">No Files found.</td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="loadingbody">
+                    <tr>
+                        <td colspan="8">Loading Files data. Please wait.</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <p-button
+            label="Cancel"
+            [text]="true"
+            severity="secondary"
+            (click)="hideViewFileHistoryDialogCard()"
+        />
+    </ng-template>
+</p-dialog>

@@ -1,0 +1,33 @@
+::ng-deep .addObjective {
+    // overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.frequency {
+    display: flex;
+    column-gap: 1rem;
+    align-items: flex-end;
+    width: 60%;
+}
+
+.grid.flex-column {
+    width: 150% !important;
+}
+
+@media (max-width: 440px) {
+    .grid.flex-column {
+        width: 200% !important;
+    }
+}
+
+@media (max-width: 372px) {
+    .grid.flex-column {
+        width: 260% !important;
+    }
+}
+
+@media (max-width: 305px) {
+    .grid.flex-column {
+        width: 260% !important;
+    }
+}

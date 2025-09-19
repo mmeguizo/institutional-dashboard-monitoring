@@ -1,0 +1,62 @@
+<div class="grid">
+    <div class="card">
+        <div class="add-user-heading my-4">
+            <span class="text-xl font-medium my-4 text-slate-950"
+                >Activity Logs</span
+            >
+        </div>
+        <p-scroller
+            [items]="logs"
+            [itemSize]="50"
+            [showLoader]="true"
+            [delay]="250"
+            styleClass="border-1 surface-border"
+            [style]="{ width: '70vw', height: '50vh' }"
+        >
+            <!--  -->
+            <ng-template pTemplate="item" let-log let-options="options">
+                <div
+                    class="flex align-items-center p-2"
+                    [ngClass]="{ 'surface-ground': options.odd }"
+                    style="height: 50px"
+                >
+                    <img
+                        [alt]="log?.user?.username"
+                        [src]="
+                            this.auth.domain +
+                            '/images/' +
+                            getUserProfilePic(log)
+                        "
+                        class="border-circle"
+                        width="32"
+                        style="vertical-align: middle"
+                    />
+                    <span class="font-bold ml-2"
+                        >{{
+                            log?.user?.username === USERNAME
+                                ? "You"
+                                : (log?.user?.username | titlecase)
+                        }}
+                    </span>
+                    &nbsp; &nbsp;
+                    <span class="underline">{{
+                        log?.actionMade | titlecase
+                    }}</span>
+                    &nbsp;
+                    <span
+                        >{{ getArticle(log?.resource) }}
+                        {{ log?.resource | titlecase }}</span
+                    >
+                    &nbsp; | &nbsp;
+                    <span class="font-medium">
+                        {{ getLogDisplayValue(log) | titlecase }}
+                    </span>
+                    &nbsp; &nbsp; | &nbsp;
+                    <span class="text-orange-500">
+                        {{ log?.createdAt | date : "medium" }}
+                    </span>
+                </div>
+            </ng-template>
+        </p-scroller>
+    </div>
+</div>

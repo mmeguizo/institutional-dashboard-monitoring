@@ -1,0 +1,18 @@
+// ::ng-deep .p-datatable-wrapper {
+//     max-height: 80% !important;
+// }
+:host ::ng-deep {
+    .p-scroller-viewport {
+        flex: none;
+    }
+
+    p-skeleton {
+        width: 100%;
+    }
+}
+
+// ::ng-deep .p-scroller {
+//     width: 100rem !important;
+//     height: 30rem !important;
+// }
+// make p-scroller responsive

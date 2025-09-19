@@ -1,0 +1,599 @@
+<div class="grid p-fluid">
+    <div
+        class="col-12 lg:col-6 xl:col-3 cursor-pointer"
+        routerLink="/admin/users"
+    >
+        <div class="card mb-0">
+            <div class="flex justify-content-between mb-3">
+                <div>
+                    <span class="block text-500 font-medium mb-3">Users</span>
+                    @if (users) {
+                    <div class="text-900 font-medium text-xl">
+                        {{ users?.document || "0" }}
+                    </div>
+                    } @else {<p-skeleton
+                        shape="circle"
+                        size="3rem"
+                        styleClass="mr-2"
+                    ></p-skeleton
+                    >}
+                </div>
+                <div
+                    class="flex align-items-center justify-content-center bg-blue-100 border-round"
+                    [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+                >
+                    <i class="pi pi-users text-blue-500 text-xl"></i>
+                </div>
+            </div>
+            @if (users) {
+            <span class="text-green-500 font-medium"
+                >{{ users?.office_head || 0 }}
+                <span class="text-500 font-medium"> HOD</span> |
+                {{ users?.director || 0 }}
+                <span class="text-500 font-medium"> DIR</span> |
+                {{ users?.vice_president || 0
+                }}<span class="text-500 font-medium"> VP</span> |
+                {{ users?.admin || 0 }}
+                <span class="text-500 font-medium">Admins</span>
+            </span>
+            } @else {
+            <p-skeleton width="12rem" height="2rem"></p-skeleton>
+            }
+        </div>
+    </div>
+    <div
+        class="col-12 lg:col-6 xl:col-3 cursor-pointer"
+        routerLink="/admin/departments"
+    >
+        <div class="card mb-0">
+            <div class="flex justify-content-between mb-3">
+                <div>
+                    <span class="block text-500 font-medium mb-3"
+                        >Departments</span
+                    >
+                    @if (deparmentData) {
+                    <div class="text-900 font-medium text-xl">
+                        {{ deparmentData?.departmentCount || "0" }}
+                    </div>
+                    } @else {<p-skeleton
+                        shape="circle"
+                        size="3rem"
+                        styleClass="mr-2"
+                    ></p-skeleton
+                    >}
+                </div>
+                <div
+                    class="flex align-items-center justify-content-center bg-orange-100 border-round"
+                    [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+                >
+                    <i class="pi pi-building text-orange-500 text-xl"></i>
+                </div>
+            </div>
+            @if (deparmentData) {
+            <span class="text-500">Active: </span>
+            <span class="text-green-500 font-medium"
+                >{{ deparmentData?.departmentActive || 0 }} -
+            </span>
+            <span class="text-500">Inactive: </span>
+            <span class="text-red-500 font-medium"
+                >{{ deparmentData?.departmentInactive || 0 }}
+            </span>
+            } @else {
+            <p-skeleton width="12rem" height="2rem"></p-skeleton>
+            }
+        </div>
+    </div>
+    <div
+        class="col-12 lg:col-6 xl:col-3 cursor-pointer"
+        routerLink="/admin/goals"
+    >
+        <div class="card mb-0">
+            <div class="flex justify-content-between mb-3">
+                <div>
+                    <span class="block text-500 font-medium mb-3"
+                        >Objectives</span
+                    >
+
+                    @if (objectivesData) {
+                    <div class="text-900 font-medium text-xl">
+                        {{ objectivesData?.objectivesCount || "0" }}
+                    </div>
+                    } @else {<p-skeleton
+                        shape="circle"
+                        size="3rem"
+                        styleClass="mr-2"
+                    ></p-skeleton
+                    >}
+                </div>
+                <div
+                    class="flex align-items-center justify-content-center bg-blue-100 border-round"
+                    [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+                >
+                    <i class="pi pi-map text-blue-500 text-xl"></i>
+                </div>
+            </div>
+
+            @if (objectivesData) {
+            <span class="text-500">Completed: </span>
+            <span class="text-green-500 font-medium"
+                >{{ objectivesData?.objectiveCompleted || 0 }} -
+            </span>
+            <span class="text-500">In-Progress: </span>
+            <span class="text-red-500 font-medium"
+                >{{ objectivesData?.objectiveUncompleted || 0 }}
+            </span>
+            } @else {
+            <p-skeleton width="12rem" height="2rem"></p-skeleton>
+            }
+        </div>
+    </div>
+    <div
+        class="col-12 lg:col-6 xl:col-3 cursor-pointer"
+        routerLink="/admin/goals"
+    >
+        <div class="card mb-0">
+            <div class="flex justify-content-between mb-3">
+                <div>
+                    <span class="block text-500 font-medium mb-3">Goals</span>
+                    @if (NewGoals) {
+                    <div class="text-900 font-medium text-xl">
+                        {{ NewGoals.goalCount || "0" }}
+                    </div>
+                    } @else {<p-skeleton
+                        shape="circle"
+                        size="3rem"
+                        styleClass="mr-2"
+                    ></p-skeleton
+                    >}
+                </div>
+                <div
+                    class="flex align-items-center justify-content-center bg-purple-100 border-round"
+                    [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+                >
+                    <i class="pi pi-compass text-purple-500 text-xl"></i>
+                </div>
+            </div>
+            @if (NewGoals) {
+            <span class="text-500">Active : </span>
+            <span class="text-green-500 font-medium"
+                >{{ NewGoals?.goalCount || 0 }} -
+            </span>
+            <span class="text-500">Deleted : </span>
+            <span class="text-red-500 font-medium"
+                >{{ NewGoals?.goalDeletedCount || 0 }}
+            </span>
+            } @else {
+            <p-skeleton width="12rem" height="2rem"></p-skeleton>
+            }
+        </div>
+    </div>
+    <div class="col-12 lg:col-12 xl:col-6">
+        <div class="card flex flex-column align-items-center">
+            <h5 class="text-left w-full">Office Budget</h5>
+            <ng-container
+                *ngIf="pieCharts?.datasets[0]?.data.length; else noData"
+            >
+                <p-chart
+                    [responsive]="true"
+                    type="pie"
+                    [data]="pieCharts"
+                    [options]="PieChartOptions"
+                ></p-chart>
+            </ng-container>
+            <ng-template #noData>
+                <p>😴</p>
+            </ng-template>
+        </div>
+    </div>
+    <div class="col-12 lg:col-12 xl:col-6">
+        <div class="card flex flex-column align-items-center">
+            <h5 class="text-left w-full">Objective Budget</h5>
+            <ng-container
+                *ngIf="
+                    pieChartsBudgetUsed?.datasets[0]?.data.length;
+                    else noData
+                "
+            >
+                <p-chart
+                    [responsive]="true"
+                    type="pie"
+                    [data]="pieChartsBudgetUsed"
+                    [options]="PieChartBudgetUsedOptions"
+                ></p-chart>
+            </ng-container>
+            <ng-template #noData>
+                <p id="emoji" style="font-size: xxx-large">😴</p>
+            </ng-template>
+        </div>
+    </div>
+    <!--
+
+
+    <div class="col-12 lg:col-12 xl:col-6">
+        <div class="card flex flex-column align-items-center">
+            <h5 class="text-left w-full">Total Budget Remaining</h5>
+            <ng-container
+                *ngIf="
+                    pieChartsBudgetRemaining?.datasets[0]?.length;
+                    else noData
+                "
+            >
+                <p-chart
+                    [responsive]="true"
+                    type="pie"
+                    [data]="pieChartsBudgetRemaining"
+                    [options]="pieChartsBudgetRemainingOptions"
+                ></p-chart>
+            </ng-container>
+            <ng-template #noData>
+                <p>😴</p>
+            </ng-template>
+        </div>
+    </div>
+    <div class="col-12 lg:col-12 xl:col-6">
+        <div class="card flex flex-column align-items-center">
+            <h5 class="text-left w-full">Goal Percentage Completion</h5>
+            <ng-container
+                *ngIf="
+                    pieChartsPercentage?.datasets[0]?.data.length;
+                    else noData
+                "
+            >
+                <p-chart
+                    [responsive]="true"
+                    type="pie"
+                    [data]="pieChartsPercentage"
+                    [options]="pieChartsPercentageOptions"
+                ></p-chart>
+            </ng-container>
+            <ng-template #noData>
+                <p>😴</p>
+            </ng-template>
+        </div>
+    </div>
+
+
+    <div class="col-12 lg:col-12 xl:col-6">
+        <div class="card flex flex-column align-items-center">
+            <h5 class="text-left w-full">Goals</h5>
+            <ng-container
+                *ngIf="pieChartsGoals?.datasets?.data?.length; else noData"
+            >
+                <p-chart
+                    [responsive]="true"
+                    type="pie"
+                    [data]="pieChartsGoals"
+                    [options]="pieChartsGoalsOptions"
+                ></p-chart>
+            </ng-container>
+            <ng-template #noData>
+                <p>😴</p>
+            </ng-template>
+        </div>
+    </div>
+
+    <div class="col-12 lg:col-12 xl:col-6">
+        <div class="card flex flex-column align-items-center">
+            <h5 class="text-left w-full">Objectives</h5>
+            <ng-container
+                *ngIf="pieChartsObjectives?.datasets?.data?.length; else noData"
+            >
+                <p-chart
+                    [responsive]="true"
+                    type="pie"
+                    [data]="pieChartsObjectives"
+                    [options]="pieChartsObjectivesOptions"
+                ></p-chart>
+            </ng-container>
+            <ng-template #noData>
+                <p>😴</p>
+            </ng-template>
+        </div>
+    </div> -->
+
+    <div class="col-12">
+        <div class="card">
+            <p-dropdown
+                [options]="campusList"
+                [(ngModel)]="selectedCampusDropdown"
+                optionLabel="name"
+                [showClear]="true"
+                placeholder="Select Campus"
+                (onChange)="onChangeCampus($event)"
+                (onClear)="onClearCampus()"
+            />
+
+            <p-tabView
+                (onChange)="onChange($event)"
+                [activeIndex]="selectedIndex"
+                orientation="right"
+            >
+                <p-tabPanel
+                    header="Goals List"
+                    class="line-height-3 m-0"
+                    [selected]="true"
+                >
+                    <div class="card">
+                        <div class="grid">
+                            <div
+                                class="col-5 align-items-center justify-content-center"
+                            >
+                                <p-table
+                                    [value]="goals"
+                                    selectionMode="single"
+                                    [loading]="loading"
+                                    *ngIf="goals"
+                                >
+                                    <ng-template pTemplate="header">
+                                        <tr>
+                                            <th>Goal</th>
+                                            <th>Campus</th>
+                                            <th>Department</th>
+                                            <th>Budget</th>
+                                        </tr>
+                                    </ng-template>
+
+                                    <ng-template pTemplate="body" let-goal>
+                                        <tr
+                                            class="cursor-pointer hover:shadow-8 text-sm"
+                                            (click)="selectedGoal(goal)"
+                                        >
+                                            <td>
+                                                {{ goal.goals | titlecase }}
+                                            </td>
+                                            <td>
+                                                {{ goal.campus | titlecase }}
+                                            </td>
+                                            <td>
+                                                {{
+                                                    goal.department | titlecase
+                                                }}
+                                            </td>
+                                            <td>{{ goal.budget | peso }}</td>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template pTemplate="emptymessage">
+                                        <tr>
+                                            <td colspan="8">No Goals found.</td>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template pTemplate="loadingbody">
+                                        <tr>
+                                            <td colspan="8">
+                                                Loading Goals data. Please wait.
+                                            </td>
+                                        </tr>
+                                    </ng-template>
+                                </p-table>
+                                <p-skeleton
+                                    width="12rem"
+                                    height="2rem"
+                                    *ngIf="!goals"
+                                ></p-skeleton>
+                            </div>
+                            <div class="col-2">
+                                <p-divider layout="vertical">
+                                    <b>OR</b>
+                                </p-divider>
+                            </div>
+                            @if (!selectedAgoal) {
+                            <div
+                                class="col-5 align-items-center justify-content-center md:flex-column"
+                            >
+                                <div
+                                    class="card flex justify-content-center flex-column"
+                                >
+                                    <p class="text-sm text-center">
+                                        Total Goal : {{ totalBudget | peso }}
+                                    </p>
+                                    <p class="text-sm text-center">
+                                        Total Objective Goal :
+                                        {{ knobValue | peso }}
+                                    </p>
+                                    <hr
+                                        class="my-3 mx-0 border-top-1 border-none surface-border"
+                                    />
+                                    <div
+                                        id="progress"
+                                        class="justify-content-around align-items-center flex flex-row sm:flex-column md:flex-row"
+                                    >
+                                        <div
+                                            class="flex align-items-center md:flex-column justify-content-center"
+                                        >
+                                            <i
+                                                class="pi pi-check text-green-500 mr-2"
+                                            ></i>
+                                            &nbsp;
+                                            <p class="text-xs">
+                                                Complete : {{ completedGoals }}
+                                            </p>
+                                        </div>
+                                        <div
+                                            class="flex align-items-center md:flex-column justify-content-center"
+                                        >
+                                            <i
+                                                class="pi pi-spin pi-spinner text-yellow-500 mr-2"
+                                            ></i>
+                                            &nbsp;
+                                            <p class="text-xs">
+                                                In Progress :{{
+                                                    inProgressGoals
+                                                }}
+                                            </p>
+                                        </div>
+                                        <div
+                                            class="flex align-items-center md:flex-column justify-content-center"
+                                        >
+                                            <i
+                                                class="pi pi-wrench text-red-500 mr-2"
+                                            ></i>
+                                            &nbsp;
+                                            <p class="text-xs">
+                                                Total Objectives:
+                                                {{ totalObjectivesCount }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            } @else { @if(loading && !pieDataBool) {
+                            <div
+                                class="col-5 align-items-center justify-content-center"
+                            >
+                                <div class="card">
+                                    <p-skeleton
+                                        width="100%"
+                                        height="2rem"
+                                        *ngIf="loading"
+                                    ></p-skeleton>
+                                </div>
+                            </div>
+                            } @else {
+
+                            <div
+                                class="col-5 align-items-center justify-content-center"
+                            >
+                                <div class="card">
+                                    @if(!pieDataBool){
+                                    <div class="mb-3 font-bold text-2xl">
+                                        <span class="text-900">No , </span
+                                        ><span class="text-blue-600"
+                                            >Objectives Yet.</span
+                                        >
+                                    </div>
+                                    } @else {
+                                    <p-chart
+                                        type="doughnut"
+                                        [data]="pieData"
+                                        [options]="pieOptions"
+                                        width="100%"
+                                        height="100%"
+                                    ></p-chart>
+                                    }
+
+                                    <div
+                                        class="text-900 font-medium text-xl mb-2"
+                                    >
+                                        {{
+                                            selectedGoalData?.goals | titlecase
+                                        }}
+                                    </div>
+                                    <div class="text-600">
+                                        {{
+                                            selectedGoalData?.department
+                                                | titlecase
+                                        }}
+                                    </div>
+                                    <hr
+                                        class="my-3 mx-0 border-top-1 border-none surface-border"
+                                    />
+                                    <div class="flex align-items-center">
+                                        <span
+                                            class="font-bold text-2xl text-900"
+                                            >{{
+                                                selectedGoalData?.budget | peso
+                                            }}</span
+                                        >
+                                    </div>
+                                    <hr
+                                        class="my-3 mx-0 border-top-1 border-none surface-border"
+                                    />
+                                    <ul class="list-none p-0 m-0 flex-grow-1">
+                                        @for (item of objectivesSideData; track
+                                        item.id) {
+                                        <li
+                                            class="flex align-items-center mb-3"
+                                        >
+                                            <span class="text-sm"
+                                                >{{
+                                                    item.strategic_objective
+                                                        | firstFourWords
+                                                        | titlecase
+                                                }}
+                                            </span>
+                                            &nbsp; - &nbsp;
+                                            <span class="text-sm"
+                                                >&#8369;
+                                                {{
+                                                    item.budget
+                                                        | abbreviation
+                                                            : "number"
+                                                }}
+                                            </span>
+                                            &nbsp; - &nbsp;
+                                            <span class="text-sm">{{
+                                                item.date_added
+                                                    | date : "mediumDate"
+                                            }}</span>
+                                            &nbsp; - &nbsp; @if(item.completed){
+                                            <i
+                                                class="pi pi-check-circle text-green-500 mr-2"
+                                                pTooltip="Completed"
+                                            ></i>
+                                            } @else{
+                                            <i
+                                                class="pi pi-exclamation-triangle text-red-500 mr-2"
+                                                pTooltip="In Progress"
+                                            ></i>
+                                            }
+                                        </li>
+                                        <hr
+                                            class="mb-3 mx-0 border-top-1 border-none surface-border mt-auto"
+                                        />
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+
+                            } }
+                        </div>
+                    </div>
+                </p-tabPanel>
+            </p-tabView>
+        </div>
+    </div>
+</div>
+
+<!-- old files  -->
+<!-- <div class="card flex flex-column align-items-center">
+            <p-dropdown
+                [options]="goalBarChartList"
+                [(ngModel)]="selectedBarDepartmentDropdown"
+                optionLabel="name"
+                [showClear]="true"
+                placeholder="Select Department"
+                (onChange)="onChangeDepartment($event)"
+                (onClear)="onClearDepartment()"
+            />
+            <p-chart
+                [responsive]="true"
+                width="30rem"
+                height="30rem"
+                [type]="barChartType"
+                [data]="barCharts"
+                [options]="options"
+            />
+        </div> -->
+
+<!-- <div  class="col-12 lg:col-6 xl:col-3">
+    <div class="card flex flex-column align-items-center">
+        <h5 class="text-left w-full">Goal Percentage Completion</h5>
+        <p-chart
+            [responsive]="true"
+            type="pie"
+            [data]="pieChartsPercentage"
+            [options]="pieChartsPercentageOptions"
+        ></p-chart>
+    </div>
+</div>
+<div  class="col-12 lg:col-6 xl:col-3">
+    <div class="card flex flex-column align-items-center">
+        <h5 class="text-left w-full">Goal Percentage Completion</h5>
+        <p-chart
+            [responsive]="true"
+            type="pie"
+            [data]="pieChartsPercentage"
+            [options]="pieChartsPercentageOptions"
+        ></p-chart>
+    </div>
+</div> -->

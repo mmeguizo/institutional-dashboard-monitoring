@@ -1,0 +1,333 @@
+<div class="layout-topbar">
+    <button
+        #menubutton
+        class="p-link layout-topbar-button mr-2"
+        (click)="layoutService.onMenuToggle()"
+    >
+        <i class="pi pi-bars"></i>
+    </button>
+
+    <a class="layout-topbar-logo" routerLink="/">
+        <img
+            src="assets/layout/images/{{
+                layoutService.config().colorScheme === 'light' ? 'logo' : 'logo'
+            }}.png"
+            alt="logo"
+        />
+        <span class="text-xl">Institutional Dashboard Monitoring</span>
+    </a>
+
+    <button
+        #topbarmenubutton
+        class="p-link layout-topbar-menu-button layout-topbar-button"
+        (click)="layoutService.showProfileSidebar()"
+    >
+        <i class="pi pi-ellipsis-v"></i>
+    </button>
+
+    <!-- <i
+        class="notification-bell notification-badge pi pi-bell mr-4 p-text-secondary cursor-pointer"
+        pBadge
+        [attr.value]="notificationCount"
+        style="font-size: 2rem"
+        [ngClass]="{
+            'animate-bell': notificationCount > 0 && !bellClicked,
+            clicked: bellClicked
+        }"
+        value="{{ notificationCount }}"
+        (click)="onBellClick($event); op2.toggle($event)"
+    >
+    </i>
+    <p-overlayPanel
+        id="notificationTable"
+        #op2
+        [showCloseIcon]="true"
+        [dismissable]="false"
+        [style]="{ width: '450px' }"
+        (onHide)="onOverlayHide()"
+    >
+        <ng-template pTemplate>
+            <p-table
+                [value]="notifications"
+                selectionMode="single"
+                [(selection)]="selectedNotification"
+                [paginator]="true"
+                [rows]="5"
+                responsiveLayout="scroll"
+                [loading]="loading"
+            >
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="min-width: 8rem">Goal</th>
+                        <th style="min-width: 8rem">Objective</th>
+                        <th style="min-width: 8rem">Department</th>
+                        <th style="min-width: 8rem">From</th>
+                        <th style="min-width: 10rem">Message</th>
+                        <th style="min-width: 8rem">To</th>
+                        <th style="min-width: 5rem">Read</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-notification>
+                    @if(role === 'admin'){
+                    <tr
+                        [ngClass]="{
+                            'bg-green-100': !notification.isRead,
+                            'bg-blue-100': notification.isRead
+                        }"
+                        (click)="onNotificationClick(notification)"
+                        style="cursor: pointer"
+                    >
+                    <td>{{ notification.goalDetails.goals }}</td>
+                    <td>{{ notification.objectiveDetails.strategic_objective }}</td>
+
+                        <td>
+                            {{
+                                notification.from.department
+                                    | abbreviateDepartment
+                            }}
+                        </td>
+                        <td>{{ notification.from.username }}</td>
+                        <td>{{ notification.metadata.remarks }}</td>
+                        <td>{{ notification.to.username }}</td>
+                        <td>{{ notification.isRead ? 'Yes' : 'No' }}</td>
+                    </tr>
+
+                    } @else if (id !== notification.userId) {
+                    <tr
+                        [ngClass]="{
+                            'bg-green-100': !notification.isRead,
+                            'bg-blue-100': notification.isRead
+                        }"
+                        (click)="onNotificationClick(notification)"
+                        style="cursor: pointer"
+                    >
+                    <td>{{ notification.goalDetails.goals }}</td>
+                    <td>{{ notification.objectiveDetails.strategic_objective }}</td>
+                        <td>
+                            {{
+                                notification.from.department
+                                    | abbreviateDepartment
+                            }}
+                        </td>
+                        <td>{{ notification.from.username }}</td>
+                        <td>{{ notification.metadata.remarks }}</td>
+                        <td>{{ notification.to.username }}</td>
+                        <td>{{ notification.isRead ? 'Yes' : 'No' }}</td>
+                    </tr>
+
+                    }
+                </ng-template>
+            </p-table>
+        </ng-template>
+    </p-overlayPanel> -->
+
+    <div
+        #topbarmenu
+        class="layout-topbar-menu"
+        [ngClass]="{
+            'layout-topbar-menu-mobile-active':
+                layoutService.state.profileSidebarVisible
+        }"
+    >
+        <p-menubar #avatarMenu [model]="Listitems">
+            <ng-template pTemplate="end">
+                <button class="p-link layout-topbar-button">
+                    <img
+                        [(src)]="this.dangerousUrl"
+                        alt="Image"
+                        class="rounded-full"
+                        height="30px"
+                        (click)="avatarMenu.toggle($event)"
+                    />
+                    <span>Profile</span>
+                </button>
+            </ng-template>
+        </p-menubar>
+        <p-toast></p-toast>
+    </div>
+    <p-dialog
+        header="Edit Profile"
+        [(visible)]="visible"
+        [style]="{ width: '25rem' }"
+        position="top"
+        autoZIndex="true"
+    >
+        <form [formGroup]="form">
+            <div class="flex align-items-center gap-3 mb-3">
+                <label for="firstname" class="font-semibold w-6rem"
+                    >First Name</label
+                >
+                <input
+                    pInputText
+                    id="firstname"
+                    class="flex-auto"
+                    autocomplete="off"
+                    [ngClass]="
+                        form?.get('firstname').touched &&
+                        form.controls['firstname'].errors?.required
+                            ? 'ng-invalid'
+                            : ''
+                    "
+                    formControlName="firstname"
+                />
+            </div>
+            <div class="flex align-items-center gap-3 mb-3">
+                <label for="lastname" class="font-semibold w-6rem"
+                    >Last Name</label
+                >
+                <input
+                    pInputText
+                    id="lastname"
+                    class="flex-auto"
+                    autocomplete="off"
+                    [ngClass]="
+                        form?.get('lastname').touched &&
+                        form.controls['lastname'].errors?.required
+                            ? 'ng-invalid'
+                            : ''
+                    "
+                    formControlName="lastname"
+                />
+            </div>
+            <div class="flex align-items-center gap-3 mb-3">
+                <label for="username" class="font-semibold w-6rem"
+                    >Username</label
+                >
+                <input
+                    pInputText
+                    id="username"
+                    class="flex-auto"
+                    autocomplete="off"
+                    [ngClass]="
+                        form?.get('username').touched &&
+                        form.controls['username'].errors?.required
+                            ? 'ng-invalid'
+                            : ''
+                    "
+                    formControlName="username"
+                />
+            </div>
+            <div class="flex align-items-center gap-3 mb-5">
+                <label for="email" class="font-semibold w-6rem">Email</label>
+                <input
+                    pInputText
+                    id="email"
+                    class="flex-auto"
+                    [ngClass]="
+                        form?.get('email').touched &&
+                        form.controls['email'].errors?.required
+                            ? 'ng-invalid'
+                            : ''
+                    "
+                    formControlName="email"
+                    autocomplete="off"
+                />
+            </div>
+            <div class="flex align-items-center gap-3 mb-5">
+                <label for="password1" class="font-semibold w-6rem"
+                    >Old Password</label
+                >
+                <p-password
+                    id="password1"
+                    [ngClass]="
+                        form?.get('old_password').touched &&
+                        form.controls['old_password'].errors?.required
+                            ? 'ng-invalid'
+                            : ''
+                    "
+                    [toggleMask]="true"
+                    class="flex-auto"
+                    formControlName="old_password"
+                ></p-password>
+            </div>
+            <div class="flex align-items-center gap-3 mb-5">
+                <label for="password1" class="font-semibold w-6rem"
+                    >New Password</label
+                >
+                <p-password
+                    id="password1"
+                    [toggleMask]="true"
+                    class="flex-auto"
+                    formControlName="password"
+                    [ngClass]="{ passwordNotMatch: 'ng-invalid' }"
+                ></p-password>
+            </div>
+            <div class="flex align-items-center gap-3 mb-5">
+                <label for="password1" class="font-semibold w-6rem"
+                    >Confirm Password</label
+                >
+                <p-password
+                    id="password1"
+                    [toggleMask]="true"
+                    class="flex-auto"
+                    [ngClass]="{ passwordNotMatch: 'ng-invalid' }"
+                    formControlName="confirmPassword"
+                ></p-password>
+            </div>
+            <div class="flex align-items-center gap-3 mb-5">
+                @if (profile_pic) {
+                <div
+                    class="display-photo"
+                    [style.background-image]="
+                        'url(' +
+                        this.auth.domain +
+                        '/images/' +
+                        (profile_pic || 'no-photo.png') +
+                        ')'
+                    "
+                    (click)="openFile($event, 'file')"
+                ></div>
+                }
+                <input type="file" name="file" class="d-none" id="file" />
+            </div>
+            <div class="flex gap-2 footer-button">
+                <p-button
+                    label="Cancel"
+                    severity="secondary"
+                    (click)="visible = false"
+                />
+                <p-button label="Save" (click)="updates(form)" />
+            </div>
+        </form>
+    </p-dialog>
+</div>
+
+<p-dialog
+    header="Logout?"
+    [(visible)]="logout"
+    position="top"
+    showEffect="fade"
+    [style]="{ width: '20vw' }"
+    [breakpoints]="{ '960px': '50vw' }"
+>
+    <p class="line-height-3 m-0">Are you sure you want to logout?</p>
+    <ng-template pTemplate="footer">
+        <button
+            pButton
+            icon="pi pi-check"
+            (click)="kickout()"
+            label="Ok"
+            class="p-button-outlined"
+        ></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog
+    header="Notification Details"
+    [(visible)]="notificationDialogVisible"
+    [style]="{ width: '30vw' }"
+    [breakpoints]="{ '960px': '75vw' }"
+    [dismissableMask]="true"
+    (onHide)="onDialogClose()"
+>
+    <p>{{ selectedNotification?.message }}</p>
+    <p><strong>From:</strong> {{ selectedNotification?.from?.firstname }}</p>
+    <ng-template pTemplate="footer">
+        <button
+            pButton
+            icon="pi pi-times"
+            label="Close"
+            (click)="notificationDialogVisible = false"
+        ></button>
+    </ng-template>
+</p-dialog>

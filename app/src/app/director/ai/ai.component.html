@@ -1,0 +1,85 @@
+<div class="col-12">
+    <div class="card">
+        <span class="text-xs font-italic bg-[#dbdbdb]">
+            Note: Dont post sensitive data</span
+        >
+        <div class="chat">
+            <div class="chat-title">
+                <i class="pi pi-google"></i>
+                <!--   <p-dropdown
+                    [options]="cities"
+                    [(ngModel)]="selectedCity"
+                    optionLabel="name"
+                    [showClear]="true"
+                    placeholder="Select a City"
+                    (onChange)="onCityChange($event)"
+                /> -->
+            </div>
+
+            <div class="messages" #messagesContent>
+                <!-- <div class="messages-content">
+                    <div
+                        class="message"
+                        *ngFor="let message of messages"
+                        [ngClass]="{
+                            'message-personal': message.isPersonal,
+                            'message-ai': !message.isPersonal,
+                            loading: message.isLoading
+                        }"
+                    >
+                        <markdown
+                            [data]="message.text | markdown | async"
+                        ></markdown>
+
+                        <div class="my-1"></div>
+                        <div *ngIf="message.isLoading" class="loading">
+                            <span></span>
+                        </div>
+                    </div>
+                </div> -->
+                <div class="messages-content">
+                    <div
+                        class="message"
+                        *ngFor="let message of messages"
+                        [ngClass]="{
+                            'message-personal': message.isPersonal,
+                            'message-ai': !message.isPersonal,
+                            loading: message.isLoading,
+                            'greeting-message':
+                                !message.isPersonal &&
+                                message.text.includes('Chmsu QOAP')
+                        }"
+                    >
+                        <markdown
+                            [data]="message.text | markdown | async"
+                        ></markdown>
+
+                        <div class="my-1"></div>
+                        <div *ngIf="message.isLoading" class="loading">
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div (keydown.enter)="onEnter($event)" class="message-box">
+                <textarea
+                    [(ngModel)]="newMessageText"
+                    #messageInput
+                    type="text"
+                    class="message-input"
+                    placeholder="Type message..."
+                ></textarea>
+                <button (click)="sendMessage()" class="message-submit">
+                    Send
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--
+
+ <div *ngFor="let markdownItem of markdownData">
+      <markdown [data]="markdownItem"></markdown>
+    </div>
+
+ -->

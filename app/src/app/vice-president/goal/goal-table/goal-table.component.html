@@ -1,0 +1,664 @@
+<p-toast [autoZIndex]="true"></p-toast>
+
+<div class="grid">
+    <div class="col-12">
+        <div class="card">
+            <div class="add-user-heading">
+                <span class="text-xl font-medium mt-2 text-slate-950"
+                    >Goals</span
+                >
+                <button
+                    (click)="addGoal()"
+                    pButton
+                    icon="pi pi-compass"
+                    label="Add Goal"
+                ></button>
+
+                <!-- add user dialog -->
+            </div>
+            <p-table
+                id="goalTable"
+                #dt1
+                [value]="goals"
+                dataKey="id"
+                [rows]="10"
+                [loading]="loading"
+                [rowHover]="true"
+                styleClass="p-datatable-gridlines"
+                [paginator]="true"
+                [globalFilterFields]="[
+                    'goals',
+                    'budget',
+                    'department',
+                    'campus',
+                    'users.username',
+                    'createdAt',
+                    'options'
+                ]"
+                responsiveLayout="scroll"
+            >
+                <ng-template pTemplate="caption">
+                    <div
+                        class="flex justify-content-between flex-column sm:flex-row"
+                    >
+                        <button
+                            pButton
+                            label="Clear"
+                            class="p-button-outlined mb-2"
+                            icon="pi pi-filter-slash"
+                            (click)="clear(dt1)"
+                        ></button>
+                        <span class="p-input-icon-left mb-2">
+                            <i class="pi pi-search"></i>
+                            <input
+                                pInputText
+                                type="text"
+                                #filter
+                                (input)="onGlobalFilter(dt1, $event)"
+                                placeholder="Search Keyword"
+                                class="p-inputtext p-component p-element w-full"
+                            />
+                        </span>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Goals
+                                <p-columnFilter
+                                    type="text"
+                                    field="goals"
+                                    display="menu"
+                                    placeholder="Search by Goals"
+                                ></p-columnFilter>
+                            </div>
+                        </th>
+                        <!-- <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Budget Utilization
+                                <p-columnFilter
+                                    type="text"
+                                    field="budget"
+                                    display="menu"
+                                    placeholder="Search by Budget"
+                                ></p-columnFilter>
+                            </div>
+                        </th> -->
+
+                        <th style="min-width: 12rem">
+                            <p-columnFilter
+                                field="department"
+                                matchMode="in"
+                                [showMenu]="false"
+                            >
+                                <ng-template
+                                    pTemplate="filter"
+                                    let-value
+                                    let-filter="filterCallback"
+                                >
+                                    <p-multiSelect
+                                        id="departmentSelectId"
+                                        [ngModel]="value"
+                                        [options]="deptDropdownValue"
+                                        placeholder="Search by Department"
+                                        (onChange)="filter($event.value)"
+                                        optionLabel="name"
+                                        optionValue="name"
+                                    >
+                                        <ng-template
+                                            let-option
+                                            pTemplate="item"
+                                        >
+                                            <div
+                                                class="inline-block vertical-align-middle"
+                                            >
+                                                <span class="ml-1 mt-1">
+                                                    {{ option.name }}
+                                                </span>
+                                            </div>
+                                        </ng-template>
+                                    </p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Campus
+                                <p-columnFilter
+                                    type="text"
+                                    field="campus"
+                                    display="menu"
+                                    placeholder="Search by Campus"
+                                ></p-columnFilter>
+                            </div>
+                        </th>
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Created By
+                                <p-columnFilter
+                                    type="text"
+                                    field="users.username"
+                                    display="menu"
+                                    placeholder="Search by Created By"
+                                ></p-columnFilter>
+                            </div>
+                        </th>
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Created Date
+                                <p-columnFilter
+                                    type="text"
+                                    field="createdAt"
+                                    display="menu"
+                                    placeholder="eg. 2024-06-28"
+                                ></p-columnFilter>
+                            </div>
+                        </th>
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Progress Completion
+                            </div>
+                        </th>
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Options
+                            </div>
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-goal>
+                    <tr>
+                        <td>
+                            <button
+                                (click)="
+                                    getObjectives(
+                                        goal.id,
+                                        goal._id,
+                                        goal.goallistsId,
+                                        goal.goals,
+                                        goal
+                                    )
+                                "
+                                pButton
+                                pRipple
+                                type="button"
+                                class="p-button-help p-button-text"
+                                pTooltip="Show/Add objectives"
+                                tooltipPosition="top"
+                            >
+                                {{ goal.goals | titlecase }}
+                            </button>
+                        </td>
+                        <!-- <td>
+                            <p-chip
+                                label="View Budget"
+                                icon="pi pi-wallet "
+                                styleClass="m-1 cursor-pointer bg-teal-200 "
+                                (click)="op.toggle($event)"
+                            ></p-chip>
+                            <p-overlayPanel #op>
+                                <p-card
+                                    [header]="goal?.budget | peso"
+                                    [subheader]="
+                                        'Budget Utilization:  ' +
+                                        (goal?.remainingPercentage || 0) +
+                                        '%' +
+                                        ' | ' +
+                                        ' Remaining: ' +
+                                        (goal?.remainingBudget || '0' | peso)
+                                    "
+                                    [style]="{ width: '400px' }"
+                                >
+                                    <div
+                                        *ngFor="
+                                            let obj of goal?.objectivesDetails
+                                        "
+                                        class="mb-1"
+                                    >
+                                        <span>
+                                            <i
+                                                class="pi pi-money-bill bg-green-400"
+                                            ></i>
+                                            {{
+                                                obj?.clients?.length > 12
+                                                    ? obj.clients.substring(
+                                                          0,
+                                                          12
+                                                      ) + "...."
+                                                    : (obj.clients | titlecase)
+                                            }}
+                                            :
+                                        </span>
+                                        <span
+                                            >{{ obj?.budget | peso }} -
+                                            <p-tag
+                                                [severity]="
+                                                    obj?.complete
+                                                        ? 'success'
+                                                        : 'warning'
+                                                "
+                                                [value]="
+                                                    obj?.complete
+                                                        ? 'Completed'
+                                                        : 'In Progress'
+                                                "
+                                            ></p-tag
+                                        ></span>
+                                        <hr />
+                                    </div>
+                                    &nbsp; &nbsp;
+                                    <div *ngIf="!goal.objectivesDetails">
+                                        <span
+                                            >No Project Yet :
+                                            <i class="pi pi-wrench"></i>
+                                        </span>
+                                    </div>
+                                </p-card>
+                            </p-overlayPanel>
+                        </td> -->
+
+                        <td>
+                            {{ goal.department | titlecase }}
+                        </td>
+                        <td>
+                            {{ goal.campus | titlecase }}
+                        </td>
+                        <td>
+                            {{ goal.users.username | titlecase }}
+                        </td>
+                        <td>
+                            {{ goal.createdAt | date : "mediumDate" }}
+                            <!-- {{ goal.searchDate | date : "mediumDate" }} -->
+                        </td>
+                        <td>
+                            <!-- <div class="col">
+                                <p-progressBar
+                                    [color]="'#1da750'"
+                                    [value]="goal.completion_percentage"
+                                    [showValue]="true"
+                                ></p-progressBar>
+                            </div> -->
+
+                            <p class="text-center">
+                                {{ goal.completion_percentage }}%
+                            </p>
+                        </td>
+                        <!-- #1da750 -->
+                        <td>
+                            <div class="options-users">
+                                <i
+                                    (click)="updateGoal(goal)"
+                                    class="pi pi-file-edit text-xl"
+                                    style="color: #0ea5e9; cursor: pointer"
+                                ></i>
+                                <i
+                                    (click)="deleteGoalDialog($event, goal._id)"
+                                    class="pi pi-trash text-xl"
+                                    style="color: #ef4444; cursor: pointer"
+                                ></i>
+                            </div>
+                            <!-- <p-toast></p-toast> -->
+                            <p-confirmPopup key="deleteGoal"></p-confirmPopup>
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage">
+                    <tr>
+                        <td colspan="8">No Goals found Admin.</td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="loadingbody">
+                    <tr>
+                        <td colspan="8">Loading Goals data. Please wait.</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+</div>
+
+<!--
+<div class="grid">
+    <div class="col-12">
+        <div class="card">
+            <div class="add-user-heading">
+                <span class="text-xl font-medium mt-2 text-slate-950"
+                    >Goals</span
+                >
+                <button
+                    (click)="addGoal()"
+                    pButton
+                    icon="pi pi-compass"
+                    label="Add Goal"
+                ></button>
+
+            </div>
+            <p-table
+                #dt1
+                id="goalTable"
+                [value]="goals"
+                dataKey="id"
+                [rows]="10"
+                [loading]="loading"
+                [rowHover]="true"
+                styleClass="p-datatable-gridlines"
+                [paginator]="true"
+                [globalFilterFields]="[
+                    'goals',
+                    'budget',
+                    'department',
+                    'campus',
+                    'users.username',
+                    'createdAt',
+                    'options'
+                ]"
+                responsiveLayout="scroll"
+            >
+                <ng-template pTemplate="caption">
+                    <div
+                        class="flex justify-content-between flex-column sm:flex-row"
+                    >
+                        <button
+                            pButton
+                            label="Clear"
+                            class="p-button-outlined mb-2"
+                            icon="pi pi-filter-slash"
+                            (click)="clear(dt1)"
+                        ></button>
+                        <span class="p-input-icon-left mb-2">
+                            <i class="pi pi-search"></i>
+                            <input
+                                pInputText
+                                type="text"
+                                #filter
+                                (input)="onGlobalFilter(dt1, $event)"
+                                placeholder="Search Keyword"
+                                class="p-inputtext p-component p-element w-full"
+                            />
+                        </span>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Goals
+                                <p-columnFilter
+                                    type="text"
+                                    field="goals"
+                                    display="menu"
+                                    placeholder="Search by Goals"
+                                ></p-columnFilter>
+                            </div>
+                        </th>
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Budget Utilization
+                                <p-columnFilter
+                                    type="text"
+                                    field="budget"
+                                    display="menu"
+                                    placeholder="Search by Budget"
+                                ></p-columnFilter>
+                            </div>
+                        </th>
+
+                        <th style="min-width: 12rem">
+
+                            <p-columnFilter
+                                field="department"
+                                matchMode="in"
+                                [showMenu]="false"
+                            >
+                                <ng-template
+                                    pTemplate="filter"
+                                    let-value
+                                    let-filter="filterCallback"
+                                >
+                                    <p-multiSelect
+                                        [ngModel]="value"
+                                        [options]="deptDropdownValue"
+                                        placeholder="Search by Department"
+                                        (onChange)="filter($event.value)"
+                                        optionLabel="name"
+                                        optionValue="name"
+                                    >
+                                        <ng-template
+                                            let-option
+                                            pTemplate="item"
+                                        >
+                                            <div
+                                                class="inline-block vertical-align-middle"
+                                            >
+                                                <span class="ml-1 mt-1">
+                                                    {{ option.name }}
+                                                </span>
+                                            </div>
+                                        </ng-template>
+                                    </p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Campus
+                                <p-columnFilter
+                                    type="text"
+                                    field="campus"
+                                    display="menu"
+                                    placeholder="Search by Campus"
+                                ></p-columnFilter>
+                            </div>
+                        </th>
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Created By
+                                <p-columnFilter
+                                    type="text"
+                                    field="users.username"
+                                    display="menu"
+                                    placeholder="Search by Created By"
+                                ></p-columnFilter>
+                            </div>
+                        </th>
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Created Date
+                                <p-columnFilter
+                                    type="text"
+                                    field="createdAt"
+                                    display="menu"
+                                    placeholder="eg. 2024-06-28"
+                                ></p-columnFilter>
+                            </div>
+                        </th>
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Progress Completion
+                            </div>
+                        </th>
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Options
+                            </div>
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-goal>
+                    <tr>
+                        <td>
+                            <button
+                                (click)="
+                                    getObjectives(
+                                        goal.id,
+                                        goal._id,
+                                        goal.goallistsId,
+                                        goal.goals,
+                                        goal.remainingBudget,
+                                        goal
+                                    )
+                                "
+                                pButton
+                                pRipple
+                                type="button"
+                                class="p-button-help p-button-text"
+                                pTooltip="Show/Add objectives"
+                                tooltipPosition="top"
+                            >
+                                {{ goal.goals | titlecase }}
+                            </button>
+                        </td>
+                        <td>
+                            <p-chip
+                                label="View Budget"
+                                icon="pi pi-wallet "
+                                styleClass="m-1 cursor-pointer bg-teal-200 "
+                                (click)="op.toggle($event)"
+                            ></p-chip>
+                            <p-overlayPanel #op>
+                                <p-card
+                                    [header]="goal?.budget | peso"
+                                    [subheader]="
+                                        'Budget Utilization:  ' +
+                                        (goal?.remainingPercentage || 0) +
+                                        '%' +
+                                        ' | ' +
+                                        ' Remaining: ' +
+                                        (goal?.remainingBudget || '0' | peso)
+                                    "
+                                    [style]="{ width: '400px' }"
+                                >
+                                    <div
+                                        *ngFor="
+                                            let obj of goal?.objectivesDetails
+                                        "
+                                        class="mb-1"
+                                    >
+                                        <span>
+                                            <i
+                                                class="pi pi-money-bill bg-green-400"
+                                            ></i>
+                                            {{
+                                                obj?.clients?.length > 12
+                                                    ? obj.clients.substring(
+                                                          0,
+                                                          12
+                                                      ) + "...."
+                                                    : (obj.clients | titlecase)
+                                            }}
+                                            :
+                                        </span>
+                                        <span
+                                            >{{ obj?.budget | peso }} -
+                                            <p-tag
+                                                [severity]="
+                                                    obj?.complete
+                                                        ? 'success'
+                                                        : 'warning'
+                                                "
+                                                [value]="
+                                                    obj?.complete
+                                                        ? 'Completed'
+                                                        : 'In Progress'
+                                                "
+                                            ></p-tag
+                                        ></span>
+                                        <hr />
+                                    </div>
+                                    &nbsp; &nbsp;
+                                    <div *ngIf="!goal.objectivesDetails">
+                                        <span
+                                            >No Project Yet :
+                                            <i class="pi pi-wrench"></i>
+                                        </span>
+                                    </div>
+                                </p-card>
+                            </p-overlayPanel>
+                        </td>
+
+                        <td>
+                            {{ goal.department | titlecase }}
+                        </td>
+                        <td>
+                            {{ goal.campus | titlecase }}
+                        </td>
+                        <td>
+                            {{ goal.users.username | titlecase }}
+                        </td>
+                        <td>
+                            {{ goal.createdAt | date : "mediumDate" }}
+
+                        </td>
+                        <td>
+                            <div class="col">
+                                <p-progressBar
+                                    [color]="'#1da750'"
+                                    [value]="goal.completion_percentage"
+                                    [showValue]="true"
+                                ></p-progressBar>
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="options-users">
+                                <i
+                                    (click)="updateGoal(goal)"
+                                    class="pi pi-file-edit text-xl"
+                                    style="color: #0ea5e9; cursor: pointer"
+                                ></i>
+                                <i
+                                    (click)="deleteGoalDialog($event, goal._id)"
+                                    class="pi pi-trash text-xl"
+                                    style="color: #ef4444; cursor: pointer"
+                                ></i>
+                            </div>
+
+                            <p-confirmPopup key="deleteGoal"></p-confirmPopup>
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage">
+                    <tr>
+                        <td colspan="8">No Goals found for the Office.</td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="loadingbody">
+                    <tr>
+                        <td colspan="8">Loading Goals data. Please wait.</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+</div> -->

@@ -1,0 +1,339 @@
+<div class="grid">
+    <div class="col-12 lg:col-12 xl:col-6">
+        <div class="card mb-0">
+            <div class="flex justify-content-between mb-3">
+                <div>
+                    <span class="block text-500 font-medium mb-3">Goals</span>
+                    @if (getAllObjectivesUnderAVicePresidentData) {
+                    <div class="text-900 font-medium text-xl">
+                        {{
+                            completedGoalsFromApi + uncompletedGoalsFromApi ||
+                                "0"
+                        }}
+                    </div>
+                    } @else {<p-skeleton
+                        shape="circle"
+                        size="3rem"
+                        styleClass="mr-2"
+                    ></p-skeleton
+                    >}
+                </div>
+                <div
+                    class="flex align-items-center justify-content-center bg-blue-100 border-round"
+                    [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+                >
+                    <i class="pi pi-users text-blue-500 text-xl"></i>
+                </div>
+            </div>
+
+            @if (getAllObjectivesUnderAVicePresidentData) {
+            <span class="text-500">Done: </span>
+            <span class="text-green-500 font-medium"
+                >{{ completedGoalsFromApi || 0 }}
+            </span>
+            &nbsp; | &nbsp;
+            <span class="text-500">In-Progress: </span>
+
+            <span class="text-red-500 font-medium"
+                >{{ uncompletedGoalsFromApi || 0 }}
+            </span>
+            } @else {
+            <p-skeleton width="12rem" height="2rem"></p-skeleton>
+            }
+        </div>
+    </div>
+    <div class="col-12 lg:col-12 xl:col-6">
+        <div class="card mb-0">
+            <div class="flex justify-content-between mb-3">
+                <div>
+                    <span class="block text-500 font-medium mb-3"
+                        >Objectives</span
+                    >
+
+                    @if (getAllObjectivesUnderAVicePresidentData) {
+                    <div class="text-900 font-medium text-xl">
+                        {{
+                            getAllObjectivesUnderAVicePresidentData?.Incompleted +
+                                getAllObjectivesUnderAVicePresidentData?.completed ||
+                                0
+                        }}
+                    </div>
+                    } @else {<p-skeleton
+                        shape="circle"
+                        size="3rem"
+                        styleClass="mr-2"
+                    ></p-skeleton
+                    >}
+                </div>
+                <div
+                    class="flex align-items-center justify-content-center bg-blue-100 border-round"
+                    [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+                >
+                    <i class="pi pi-map text-blue-500 text-xl"></i>
+                </div>
+            </div>
+
+            @if (getAllObjectivesUnderAVicePresidentData) {
+            <span class="text-500">Done: </span>
+            <span class="text-green-500 font-medium"
+                >{{ getAllObjectivesUnderAVicePresidentData?.completed }}
+            </span>
+            &nbsp; | &nbsp;
+            <span class="text-500">In-Progress: </span>
+            <span class="text-red-500 font-medium"
+                >{{ getAllObjectivesUnderAVicePresidentData?.Incompleted }}
+            </span>
+            } @else {
+            <p-skeleton width="12rem" height="2rem"></p-skeleton>
+            }
+        </div>
+    </div>
+    <div class="col-12 lg:col-12 xl:col-6">
+        <div class="card flex flex-column align-items-center">
+            <h5 class="text-left w-full">Office Budget</h5>
+            <ng-container
+                *ngIf="pieCharts?.datasets[0]?.data.length; else noData"
+            >
+                <p-chart
+                    [responsive]="true"
+                    type="pie"
+                    [data]="pieCharts"
+                    [options]="PieChartOptions"
+                ></p-chart>
+            </ng-container>
+            <ng-template #noData>
+                <p>😴</p>
+            </ng-template>
+        </div>
+    </div>
+    <div class="col-12 lg:col-12 xl:col-6">
+        <div class="card flex flex-column align-items-center">
+            <h5 class="text-left w-full">Objective Budget</h5>
+            <ng-container
+                *ngIf="
+                    pieChartsBudgetUsed?.datasets[0]?.data.length;
+                    else noData
+                "
+            >
+                <p-chart
+                    [responsive]="true"
+                    type="pie"
+                    [data]="pieChartsBudgetUsed"
+                    [options]="PieChartBudgetUsedOptions"
+                ></p-chart>
+            </ng-container>
+            <ng-template #noData>
+                <p id="emoji" style="font-size: xxx-large">😴</p>
+            </ng-template>
+        </div>
+    </div>
+
+    <!--
+    <div class="col-12 lg:col-12 xl:col-6">
+        <div class="card flex flex-column align-items-center">
+            <h5 class="text-left w-full">Total Budget</h5>
+            <ng-container
+                *ngIf="pieCharts?.datasets[0]?.data.length; else noData"
+            >
+                <p-chart
+                    [responsive]="true"
+                    type="pie"
+                    [data]="pieCharts"
+                    [options]="PieChartOptions"
+                ></p-chart>
+            </ng-container>
+            <ng-template #noData>
+                <p>😴</p>
+            </ng-template>
+        </div>
+    </div>
+    <div class="col-12 lg:col-12 xl:col-6">
+        <div class="card flex flex-column align-items-center">
+            <h5 class="text-left w-full">Total Budget Used</h5>
+            <ng-container
+                *ngIf="
+                    pieChartsBudgetUsed?.datasets[0]?.data.length;
+                    else noData
+                "
+            >
+                <p-chart
+                    [responsive]="true"
+                    type="pie"
+                    [data]="pieChartsBudgetUsed"
+                    [options]="PieChartBudgetUsedOptions"
+                ></p-chart>
+            </ng-container>
+            <ng-template #noData>
+                <p id="emoji" style="font-size: xxx-large">😴</p>
+            </ng-template>
+        </div>
+    </div> -->
+
+    <!--
+
+
+
+    <div class="col-12 lg:col-12 xl:col-6">
+        <div class="card flex flex-column align-items-center">
+            <h5 class="text-left w-full">Total Budget Remaining</h5>
+            <ng-container
+                *ngIf="
+                    pieChartsBudgetRemaining?.datasets[0]?.length;
+                    else noData
+                "
+            >
+                <p-chart
+                    [responsive]="true"
+                    type="pie"
+                    [data]="pieChartsBudgetRemaining"
+                    [options]="pieChartsBudgetRemainingOptions"
+                ></p-chart>
+            </ng-container>
+            <ng-template #noData>
+                <p>😴</p>
+            </ng-template>
+        </div>
+    </div>
+    <div class="col-12 lg:col-12 xl:col-6">
+        <div class="card flex flex-column align-items-center">
+            <h5 class="text-left w-full">Goal Percentage Completion</h5>
+            <ng-container
+                *ngIf="
+                    pieChartsPercentage?.datasets[0]?.data.length;
+                    else noData
+                "
+            >
+                <p-chart
+                    [responsive]="true"
+                    type="pie"
+                    [data]="pieChartsPercentage"
+                    [options]="pieChartsPercentageOptions"
+                ></p-chart>
+            </ng-container>
+            <ng-template #noData>
+                <p>😴</p>
+            </ng-template>
+        </div>
+    </div>
+
+
+
+    <div class="col-12 lg:col-12 xl:col-6">
+        <div class="card flex flex-column align-items-center">
+            <h5 class="text-left w-full">Goals</h5>
+            <ng-container
+                *ngIf="pieChartsGoals?.datasets?.data?.length; else noData"
+            >
+                <p-chart
+                    [responsive]="true"
+                    type="pie"
+                    [data]="pieChartsGoals"
+                    [options]="pieChartsGoalsOptions"
+                ></p-chart>
+            </ng-container>
+            <ng-template #noData>
+                <p>😴</p>
+            </ng-template>
+        </div>
+    </div>
+
+    <div class="col-12 lg:col-12 xl:col-6">
+        <div class="card flex flex-column align-items-center">
+            <h5 class="text-left w-full">Objectives</h5>
+            <ng-container
+                *ngIf="pieChartsObjectives?.datasets?.data?.length; else noData"
+            >
+                <p-chart
+                    [responsive]="true"
+                    type="pie"
+                    [data]="pieChartsObjectives"
+                    [options]="pieChartsObjectivesOptions"
+                ></p-chart>
+            </ng-container>
+            <ng-template #noData>
+                <p>😴</p>
+            </ng-template>
+        </div>
+    </div> -->
+
+    <!-- <div class="col-12 lg:col-12 xl:col-6 cursor-pointer">
+        <div class="card flex flex-column align-items-center">
+            <p-dropdown
+                [options]="goalBarChartList"
+                [(ngModel)]="selectedBarDepartmentDropdown"
+                optionLabel="name"
+                [showClear]="true"
+                placeholder="Select Department"
+                (onChange)="onChangeDepartment($event)"
+                (onClear)="onClearDepartment()"
+            />
+            <p-chart
+                [responsive]="true"
+                width="30rem"
+                height="30rem"
+                [type]="barChartType"
+                [data]="barCharts"
+                [options]="options"
+            />
+        </div>
+    </div> -->
+    <!-- <div class="col-12">
+        <div class="card">
+            <div class="add-user-heading">
+                <span class="text-xl font-medium mt-2 text-slate-950"
+                    >Calendar</span
+                >
+                <div class="demo-app">
+                    <div class="demo-app-sidebar">
+                        <div class="demo-app-sidebar-section">
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    [checked]="calendarVisible()"
+                                    (change)="handleCalendarToggle()"
+                                />
+                                toggle whole calendar
+                            </label>
+                        </div>
+                        <div class="demo-app-sidebar-section">
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    [checked]="calendarOptions().weekends"
+                                    (change)="handleWeekendsToggle()"
+                                />
+                                toggle weekends
+                            </label>
+                        </div>
+                        <div class="demo-app-sidebar-section">
+                            <h2>All Events ({{ currentEvents().length }})</h2>
+                            <ul
+                                *ngFor="
+                                    let event of currentEvents();
+                                    let i = index
+                                "
+                            >
+                                <li>{{ i + 1 }} - {{ event.title }}</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="demo-app-main">
+                        <full-calendar
+                            *ngIf="calendarVisible()"
+                            [options]="calendarOptions()"
+                        >
+                            <ng-template #eventContent let-arg>
+                                <i> {{ arg.event.image_url }} </i>
+                                <i
+                                    >{{ arg.event.extendedProps.user }} -
+                                    {{ arg.event.title }}</i
+                                >
+                            </ng-template>
+                        </full-calendar>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> -->
+</div>

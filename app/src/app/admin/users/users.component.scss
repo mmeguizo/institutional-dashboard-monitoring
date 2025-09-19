@@ -1,0 +1,35 @@
+.options-users {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.customer-badge.status-active {
+    background: #c8e6c9;
+    color: #256029;
+}
+
+.customer-badge.status-inactive {
+    background: #ffcdd2;
+    color: #c63737;
+}
+
+.customer-badge.status-pending {
+    background: #ffd8b2;
+    color: #805b36;
+}
+
+::ng-deep .p-dialog-content {
+    overflow-y: visible !important;
+}
+
+.add-user-heading {
+    display: flex;
+    justify-content: space-between;
+    margin: 0 0 1.5rem 0;
+}
+@media screen and (max-width: 757px) {
+    .footer-button-adduser {
+        flex-direction: column !important;
+    }
+}

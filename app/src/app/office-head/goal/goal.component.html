@@ -1,0 +1,66 @@
+<p-confirmPopup key="deleteGoal"></p-confirmPopup>
+
+<!-- Goal -->
+<app-goal-table
+    [addedaGoal]="parentEmitAddnewGoal"
+    [editedAGoal]="parentEmitEditGoal"
+    [deletedAGoal]="parentEmitDeleteGoal"
+    [editObjective]="parentEditSuccessObjective"
+    (addNewGoalButtonClick)="receivedAddNewGoalButtonClick($event)"
+    (editGoalButtonClick)="receivedEditGoalButtonClick($event)"
+    (getObjectiveButtonClick)="receivedGetObjectiveButtonClick($event)"
+></app-goal-table>
+<app-add-goal
+    [addNewGoal]="parentAddnewGoal"
+    (childAddGoalEvent)="receivedAddGoalEvent($event)"
+></app-add-goal>
+
+<app-edit-goal
+    [editGoal]="parentEditGoal"
+    (childEditGoalEvent)="receivedEditGoalEvent($event)"
+></app-edit-goal>
+
+<!-- Objective -->
+<app-objective-table
+    [getObjective]="parentGetObjective"
+    [addNewSuccessObjective]="parentEmitSuccessAddObjective"
+    [editObjective]="parentEditSuccessObjective"
+    (childGetObjectiveEvent)="receivedGetObjectiveEvent($event)"
+    (childAddObjectiveEvent)="receivedAddObjectiveEvent($event)"
+    (childEditObjectiveEvent)="receivedEditObjectiveEvent($event)"
+    (viewFilesEvent)="receivedViewFilesButtonClick($event)"
+    (remarksEvent)="receivedRemarksEvent($event)"
+    (printObjectiveTableEvent)="receivedPrintObjectiveTableEvent($event)"
+    (printQOMObjectiveTableEvent)="receivedPrintQOMObjectiveTableEvent($event)"
+>
+</app-objective-table>
+<app-add-objective
+    [addNewObjective]="parentEmitAddObjective"
+    (childSuccessAddObjectiveEvent)="receivedAddSuccessObjectiveEvent($event)"
+>
+</app-add-objective>
+
+<!-- files -->
+<app-add-files
+    [addNewFile]="parentAddnewFile"
+    (childAddFile)="receivedAddFileEvent($event)"
+>
+</app-add-files>
+
+<app-view-files [viewFiles]="parentViewFiles"></app-view-files>
+
+<app-edit-objective
+    [getObjective]="parentEditObjective"
+    (childUpdateObjective)="receivedUpdateObjective($event)"
+>
+</app-edit-objective>
+<app-print-objective-table [printFile]="parentPrintFile">
+</app-print-objective-table>
+
+<app-print-qom [printQOMFile]="parentPrintQom"></app-print-qom>
+
+<app-remarks
+    [remarksFromGoalParent]="parentRemarks"
+    (childRemarksEvent)="receivedRemarksEvent($event)"
+>
+</app-remarks>

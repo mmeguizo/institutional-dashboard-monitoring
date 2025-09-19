@@ -1,0 +1,86 @@
+<div class="p-fluid">
+    <div class="field col-12 md:col-12">
+        <form [formGroup]="addGoalform">
+            <!-- Goal input field -->
+            <div class="field">
+                <label htmlFor="name1">Goal name</label>
+                <input
+                    pInputText
+                    id="goals"
+                    class="flex-auto"
+                    autocomplete="off"
+                    [ngClass]="
+                        addGoalform?.get('goals').touched &&
+                        addGoalform?.controls['goals'].errors?.required
+                            ? 'ng-invalid ng-dirty'
+                            : ''
+                    "
+                    formControlName="goals"
+                    required
+                />
+            </div>
+            <!-- Objectives Array -->
+            <div class="field" formArrayName="objectives">
+                <div
+                    *ngFor="
+                        let objectiveControl of objectivesArray.controls;
+                        let i = index
+                    "
+                    [formGroupName]="i"
+                >
+                    <label [htmlFor]="'objective' + i">
+                        Objective {{ i + 1 }}
+                    </label>
+                    <div class="flex align-items-center">
+                        <input
+                            pInputText
+                            formControlName="objective"
+                            [id]="'objective' + i"
+                            required
+                        />
+                        &nbsp;
+                        <!-- Add Objective Button (only on the first objective) -->
+                        <ng-container *ngIf="i === 0">
+                            <button
+                                type="button"
+                                pButton
+                                icon="pi pi-plus"
+                                (click)="addObjective()"
+                                [disabled]="!addGoalform.get('goals').valid"
+                            ></button>
+                        </ng-container>
+                        &nbsp;
+                        <!-- Remove Objective Button -->
+                        <ng-container *ngIf="i > 0">
+                            <button
+                                type="button"
+                                pButton
+                                icon="pi pi-trash"
+                                (click)="removeObjective(i)"
+                            ></button>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Save/Edit Button -->
+            <p-button
+                [label]="editing ? 'Edit' : 'Save'"
+                class="mt-4"
+                [severity]="editing ? 'warning' : 'primary'"
+                (click)="
+                    editing ? updateGoal(addGoalform) : addGoalExec(addGoalform)
+                "
+                [disabled]="!addGoalform.valid"
+            ></p-button>
+            &nbsp;
+            <button
+                type="button"
+                pButton
+                label="Clear"
+                class="p-button-outlined"
+                (click)="clearForm()"
+            ></button>
+        </form>
+    </div>
+</div>

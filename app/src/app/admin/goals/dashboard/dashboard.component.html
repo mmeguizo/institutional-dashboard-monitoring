@@ -1,0 +1,208 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card">
+            <h5>Goals with Objectives</h5>
+            @if(!loading){
+            <p-chart
+                type="bar"
+                [data]="donutData"
+                [options]="donutOptions"
+            ></p-chart>
+            } @else {
+            <p-skeleton
+                class="my-auto"
+                width="18rem"
+                height="18rem"
+            ></p-skeleton>
+            }
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="card">
+            <p-card header="Goal Summary">
+                <div class="align-items-center">
+                    <span class="block text-base font-bold mb-1">{{
+                        officeListCombine | titlecase
+                    }}</span>
+
+                    <div>
+                        <p-chip
+                            label="Goal : {{ goals.length }}"
+                            icon="pi pi-money-bill"
+                            styleClass="m-2"
+                        ></p-chip>
+                    </div>
+                    <div>
+                        <p-chip
+                            label="Total Objective Budget : {{
+                                allObjectiveBudget || 0 | peso
+                            }}"
+                            icon="pi pi-money-bill"
+                            styleClass="m-2 mb-0"
+                        ></p-chip>
+                    </div>
+                </div>
+            </p-card>
+            <div class="mt-2">
+                <p-dropdown
+                    [options]="officeList"
+                    [(ngModel)]="selectedOffice"
+                    optionLabel="name"
+                    [showClear]="true"
+                    placeholder="Select Goal Under Each Offices"
+                    (onChange)="onChangeOffice($event)"
+                    (onClear)="onClearOffice()"
+                    styleClass="w-full mb-2"
+                />
+            </div>
+
+            @if(loading){
+            <p-skeleton
+                class="my-auto"
+                width="100%"
+                height="18rem"
+            ></p-skeleton>
+            } @else {
+            <p-table
+                [value]="goals"
+                dataKey="id"
+                [expandedRowKeys]="expandedRows"
+                responsiveLayout="scroll"
+            >
+                <!--  styleClass="p-datatable-striped p-datatable-gridlines" -->
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th></th>
+                        <th>User</th>
+                        <th>Goal Name</th>
+                        <th>Department</th>
+                        <th>Budget</th>
+                        <th>Used</th>
+                        <th>Left</th>
+                        <th>Percentage Complete</th>
+                        <th>Objectives</th>
+                        <th>Total Objectives</th>
+                        <th>Completed Objectives</th>
+                        <th>Incomplete Objectives</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-goal let-expanded="expanded">
+                    <tr>
+                        <td>
+                            <button
+                                type="button"
+                                pButton
+                                pRipple
+                                [pRowToggler]="goal"
+                                class="p-button-text p-button-rounded p-button-plain"
+                                [icon]="
+                                    expanded
+                                        ? 'pi pi-chevron-down'
+                                        : 'pi pi-chevron-right'
+                                "
+                            ></button>
+                        </td>
+                        <td>
+                            <!--  [label]="goal.users.lastname.split(' ')[0]" -->
+                            <p-chip
+                                label="{{
+                                    goal.users.email.split('@')[0].split('.')[0]
+                                        | titlecase
+                                }}"
+                                [image]="
+                                    this.auth.domain +
+                                        '/images/' +
+                                        goal.users.profile_pic || 'no-photo.png'
+                                "
+                                styleClass="m-1"
+                            ></p-chip>
+                        </td>
+                        <td>{{ goal.goals }}</td>
+                        <td>{{ goal.department }}</td>
+                        <td>{{ goal.budget | currency : "PHP" : "symbol" }}</td>
+                        <td>
+                            {{
+                                goal.budgetMinusAllObjectiveBudget
+                                    | currency : "PHP" : "symbol"
+                            }}
+                        </td>
+                        <td>
+                            {{
+                                goal.remainingBudget
+                                    | currency : "PHP" : "symbol"
+                            }}
+                        </td>
+                        <td>{{ goal.completion_percentage + "%" }}</td>
+                        <td>{{ goal | objectiveNames }}</td>
+                        <td>{{ goal.objectivesDetails?.length || 0 }}</td>
+                        <td>{{ goal | completedObjectives }}</td>
+                        <td>{{ goal | incompleteObjectives }}</td>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="rowexpansion" let-goal>
+                    <tr>
+                        <td colspan="110">
+                            <div class="p-3">
+                                <p-table [value]="goal.objectivesDetails">
+                                    <ng-template pTemplate="header">
+                                        <tr>
+                                            <th>Objective</th>
+                                            <th>Frequency</th>
+                                            <th>Budget</th>
+                                            <th>Complete</th>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template pTemplate="body" let-objective>
+                                        <tr>
+                                            <td>
+                                                {{
+                                                    objective.functional_objective
+                                                }}
+                                            </td>
+                                            <td>
+                                                {{
+                                                    objective.frequency_monitoring
+                                                        | formatFrequency
+                                                }}
+                                            </td>
+                                            <td>
+                                                {{
+                                                    objective.budget
+                                                        | currency
+                                                            : "PHP"
+                                                            : "symbol"
+                                                }}
+                                            </td>
+                                            <td>
+                                                <i
+                                                    class="pi"
+                                                    [ngClass]="{
+                                                        'pi-check-circle text-green-500':
+                                                            objective.complete,
+                                                        'pi-times-circle text-red-500':
+                                                            !objective.complete
+                                                    }"
+                                                ></i>
+                                            </td>
+                                        </tr>
+                                    </ng-template>
+                                </p-table>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="footer">
+                    <tr>
+                        <td colspan="4" class="text-right">Totals</td>
+                        <td>{{ totalBudget | currency : "PHP" }}</td>
+                        <td>{{ usedBudget | currency : "PHP" }}</td>
+                        <td></td>
+                        <td colspan="5" class="text-right"></td>
+                    </tr>
+                </ng-template>
+            </p-table>
+            }
+        </div>
+    </div>
+</div>

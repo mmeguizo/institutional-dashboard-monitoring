@@ -1,0 +1,240 @@
+<p-dialog
+    styleClass="addObjective"
+    header="Note: Once file is uploaded dialog cannot be cancelled"
+    [(visible)]="editObjectiveGoalDialogCard"
+    [style]="{ width: '50rem' }"
+    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+    position="top"
+    [closable]="false"
+    (onHide)="clearEditObjectiveGoalDialogCardDatas()"
+>
+    <div class="p-fluid">
+        <div class="field col-10 md:col-10">
+            <form [formGroup]="editObjectiveGoalform">
+                <div
+                    *ngIf="
+                        editObjectiveGoalform.get('frequency_monitoring')
+                            .value === 'yearly'
+                    "
+                >
+                    <div class="grid flex-column">
+                        <div
+                            class="col-3 frequency"
+                            *ngFor="let year of yearly; let i = index"
+                        >
+                            <label for="yearly_{{ i }}">Year</label>
+
+                            <p-inputGroup>
+                                <p-inputGroupAddon>
+                                    Goal :
+                                    {{ objectiveDatas["goal_yearly_" + i] }}
+                                </p-inputGroupAddon>
+                                <p-inputNumber
+                                    id="month_{{ i }}"
+                                    formControlName="yearly_{{ i }}"
+                                    [min]="0"
+                                ></p-inputNumber>
+                            </p-inputGroup>
+
+                            <span class="p-float-label p-input-icon-left">
+                                <i class="pi pi-file-import"></i>
+                                <input
+                                    type="text"
+                                    id="lefticon"
+                                    pInputText
+                                    formControlName="file_yearly_{{ i }}"
+                                    (click)="onUpload($event, 'yearly', i)"
+                                />
+                                <label for="lefticon">{{
+                                    objectiveDatas["file_yearly_" + [i]]
+                                        ? "Upload More.."
+                                        : "Upload Files"
+                                }}</label>
+                            </span>
+                            <i
+                                class="pi pi-check-circle text-teal-400 text-2xl pr-3 pb-2"
+                                *ngIf="
+                                    editObjectiveGoalform.get(
+                                        'file_yearly_' + i
+                                    ).value
+                                "
+                            ></i>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    *ngIf="
+                        editObjectiveGoalform.get('frequency_monitoring')
+                            .value === 'monthly'
+                    "
+                >
+                    <div class="grid flex-column">
+                        <div
+                            class="col-3 frequency"
+                            *ngFor="let month of months; let i = index"
+                        >
+                            <label for="Month{{ i }}">{{ month }}</label>
+
+                            <p-inputGroup>
+                                <p-inputGroupAddon>
+                                    Goal :
+                                    {{ objectiveDatas["goal_month_" + i] }}
+                                </p-inputGroupAddon>
+                                <p-inputNumber
+                                    id="month_{{ i }}"
+                                    formControlName="month_{{ i }}"
+                                    [min]="0"
+                                ></p-inputNumber>
+                            </p-inputGroup>
+
+                            <span class="p-float-label p-input-icon-left">
+                                <i class="pi pi-file-import"></i>
+                                <input
+                                    type="text"
+                                    id="lefticon"
+                                    pInputText
+                                    formControlName="file_month_{{ i }}"
+                                    (click)="onUpload($event, 'month', i)"
+                                />
+                                <label for="lefticon">{{
+                                    objectiveDatas["file_month_" + [i]]
+                                        ? "Upload More.."
+                                        : "Upload Files"
+                                }}</label>
+                            </span>
+                            <i
+                                class="pi pi-check-circle text-teal-400 text-2xl pr-3 pb-2"
+                                *ngIf="
+                                    editObjectiveGoalform.get('file_month_' + i)
+                                        .value
+                                "
+                            ></i>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    *ngIf="
+                        editObjectiveGoalform.get('frequency_monitoring')
+                            .value === 'quarterly'
+                    "
+                >
+                    <div class="grid flex-column">
+                        <div
+                            class="col-3 frequency"
+                            *ngFor="let quarter of [0, 1, 2, 3]; let i = index"
+                        >
+                            <label for="quarter_{{ i }}">Q{{ i + 1 }}</label>
+                            <p-inputGroup>
+                                <p-inputGroupAddon>
+                                    Goal :
+                                    {{ objectiveDatas["goal_quarter_" + i] }}
+                                </p-inputGroupAddon>
+                                <p-inputNumber
+                                    id="quarter_{{ i }}"
+                                    formControlName="quarter_{{ i }}"
+                                    [min]="0"
+                                ></p-inputNumber>
+                            </p-inputGroup>
+
+                            <span class="p-float-label p-input-icon-left">
+                                <i class="pi pi-file-import"></i>
+                                <input
+                                    type="text"
+                                    id="lefticon"
+                                    pInputText
+                                    formControlName="file_quarter_{{ i }}"
+                                    (click)="onUpload($event, 'quarter', i)"
+                                />
+                                <label for="lefticon">{{
+                                    objectiveDatas["file_quarter_" + [i]]
+                                        ? "Upload More.."
+                                        : "Upload Files"
+                                }}</label>
+                            </span>
+                            <i
+                                class="pi pi-check-circle text-teal-400 text-2xl pr-3 pb-2"
+                                *ngIf="
+                                    editObjectiveGoalform.get(
+                                        'file_quarter_' + i
+                                    ).value
+                                "
+                            ></i>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    *ngIf="
+                        editObjectiveGoalform.get('frequency_monitoring')
+                            .value === 'semi_annual'
+                    "
+                >
+                    <div class="grid flex-column">
+                        <div
+                            class="col-3 frequency"
+                            *ngFor="let period of [0, 1]; let i = index"
+                        >
+                            <label for="semi_annual_{{ i }}"
+                                >Semi {{ i + 1 }}</label
+                            >
+
+                            <p-inputGroup>
+                                <p-inputGroupAddon>
+                                    Goal :
+                                    {{
+                                        objectiveDatas["goal_semi_annual_" + i]
+                                    }}
+                                </p-inputGroupAddon>
+                                <p-inputNumber
+                                    id="semi_annual_{{ i }}"
+                                    formControlName="semi_annual_{{ i }}"
+                                    [min]="0"
+                                ></p-inputNumber>
+                            </p-inputGroup>
+
+                            <span class="p-float-label p-input-icon-left">
+                                <i class="pi pi-file-import"></i>
+                                <input
+                                    type="text"
+                                    id="lefticon"
+                                    pInputText
+                                    formControlName="file_semi_annual_{{ i }}"
+                                    (click)="onUpload($event, 'semi_annual', i)"
+                                />
+                                <label for="lefticon">{{
+                                    objectiveDatas["file_semi_annual_" + [i]]
+                                        ? "Upload More.."
+                                        : "Upload Files"
+                                }}</label>
+                            </span>
+                            <i
+                                class="pi pi-check-circle text-teal-400 text-2xl pr-3 pb-2"
+                                *ngIf="
+                                    editObjectiveGoalform.get(
+                                        'file_semi_annual_' + i
+                                    ).value
+                                "
+                            ></i>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="flex justify-space-between gap-2">
+        <p-button
+            label="Cancel"
+            severity="secondary"
+            (click)="clearEditObjectiveGoalDialogCardDatas()"
+            [disabled]="uploadSuccessFlag"
+        />
+        <p-button
+            label="Edit"
+            (click)="updateSubObjectiveGoalDialogExec(editObjectiveGoalform)"
+        />
+    </div>
+</p-dialog>
+<app-add-files
+    [addNewFile]="parentAddnewFile"
+    (childAddFile)="receivedAddFileEvent($event)"
+    *ngIf="showAddFilesComponent"
+></app-add-files>

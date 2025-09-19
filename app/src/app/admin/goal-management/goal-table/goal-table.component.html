@@ -1,0 +1,122 @@
+<!-- <p-toast /> -->
+@if(loading){
+<p-progressSpinner ariaLabel="loading" />
+} @else { @if(goals.length !== 0){
+
+<div class="col-12">
+    <div class="card">
+        <!-- <p-toast></p-toast> -->
+        <p-table
+            [value]="goals"
+            dataKey="goals"
+            [expandedRowKeys]="expandedRows"
+            responsiveLayout="scroll"
+        >
+            <ng-template pTemplate="caption">
+                <button
+                    pButton
+                    icon="pi pi-fw {{ isExpanded ? 'pi-minus' : 'pi-plus' }}"
+                    label="{{ isExpanded ? 'Collapse All' : 'Expand All' }}"
+                    (click)="expandAll()"
+                ></button>
+                <div class="flex table-header"></div>
+            </ng-template>
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="width: 3rem"></th>
+                    <th pSortableColumn="goals">
+                        Goal <p-sortIcon field="goals"></p-sortIcon>
+                    </th>
+                    <th>Options</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-goal let-expanded="expanded">
+                <tr>
+                    <td>
+                        <button
+                            type="button"
+                            pButton
+                            pRipple
+                            [pRowToggler]="goal"
+                            class="p-button-text p-button-rounded p-button-plain"
+                            [icon]="
+                                expanded
+                                    ? 'pi pi-chevron-down'
+                                    : 'pi pi-chevron-right'
+                            "
+                        ></button>
+                    </td>
+                    <td style="min-width: 12rem">
+                        {{ goal.goals | titlecase }}
+                    </td>
+                    <td>
+                        <div class="options-users">
+                            <i
+                                (click)="updateGoal(goal)"
+                                class="pi pi-file-edit text-xl"
+                                style="color: #0ea5e9; cursor: pointer"
+                            ></i>
+                            &nbsp;
+                            <i
+                                (click)="deleteGoal(goal.id)"
+                                class="pi pi-trash text-xl"
+                                style="color: #ef4444; cursor: pointer"
+                            ></i>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="rowexpansion" let-goal>
+                <tr>
+                    <td colspan="7">
+                        <div class="p-3">
+                            <p-table
+                                [value]="goal.objectives"
+                                dataKey="id"
+                                responsiveLayout="scroll"
+                            >
+                                <ng-template pTemplate="header">
+                                    <tr>
+                                        <th pSortableColumn="id">
+                                            Objectives
+                                            <p-sortIcon
+                                                field="price"
+                                            ></p-sortIcon>
+                                        </th>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="body" let-objective>
+                                    <tr>
+                                        <td>
+                                            {{
+                                                objective.objective | titlecase
+                                            }}
+                                        </td>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="emptymessage">
+                                    <tr>
+                                        <td colspan="6">
+                                            There are no Objectives for this
+                                            goal yet.
+                                        </td>
+                                    </tr>
+                                </ng-template>
+                            </p-table>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+} @else {
+<span class="flex justify-content-between mt-2">No Goals Found</span>
+
+} }
+<p-confirmDialog
+    key="positionDialog"
+    [position]="position"
+    rejectButtonStyleClass="p-button-outlined"
+/>

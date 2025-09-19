@@ -1,0 +1,131 @@
+<div class="grid">
+    <div class="col-12 lg:col-12 xl:col-6">
+        <div class="card mb-0">
+            <div class="flex justify-content-between mb-3">
+                <div>
+                    <span class="block text-500 font-medium mb-3">Goals</span>
+                    @if (getAllObjectivesUnderADirectorData) {
+                    <div class="text-900 font-medium text-xl">
+                        {{
+                            completedGoalsFromApi + uncompletedGoalsFromApi ||
+                                "0"
+                        }}
+                    </div>
+                    } @else {<p-skeleton
+                        shape="circle"
+                        size="3rem"
+                        styleClass="mr-2"
+                    ></p-skeleton
+                    >}
+                </div>
+                <div
+                    class="flex align-items-center justify-content-center bg-blue-100 border-round"
+                    [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+                >
+                    <i class="pi pi-users text-blue-500 text-xl"></i>
+                </div>
+            </div>
+
+            @if (getAllObjectivesUnderADirectorData) {
+            <span class="text-500">Done: </span>
+            <span class="text-green-500 font-medium"
+                >{{ completedGoalsFromApi || 0 }}
+            </span>
+            &nbsp; | &nbsp;
+            <span class="text-500">In-Progress: </span>
+
+            <span class="text-red-500 font-medium"
+                >{{ uncompletedGoalsFromApi || 0 }}
+            </span>
+            } @else {
+            <p-skeleton width="12rem" height="2rem"></p-skeleton>
+            }
+        </div>
+    </div>
+    <div class="col-12 lg:col-12 xl:col-6">
+        <div class="card mb-0">
+            <div class="flex justify-content-between mb-3">
+                <div>
+                    <span class="block text-500 font-medium mb-3"
+                        >Objectives</span
+                    >
+
+                    @if (getAllObjectivesUnderADirectorData) {
+                    <div class="text-900 font-medium text-xl">
+                        {{
+                            getAllObjectivesUnderADirectorData?.Incompleted +
+                                getAllObjectivesUnderADirectorData?.completed ||
+                                0
+                        }}
+                    </div>
+                    } @else {<p-skeleton
+                        shape="circle"
+                        size="3rem"
+                        styleClass="mr-2"
+                    ></p-skeleton
+                    >}
+                </div>
+                <div
+                    class="flex align-items-center justify-content-center bg-blue-100 border-round"
+                    [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+                >
+                    <i class="pi pi-map text-blue-500 text-xl"></i>
+                </div>
+            </div>
+
+            @if (getAllObjectivesUnderADirectorData) {
+            <span class="text-500">Done: </span>
+            <span class="text-green-500 font-medium"
+                >{{ getAllObjectivesUnderADirectorData?.completed }}
+            </span>
+            &nbsp; | &nbsp;
+            <span class="text-500">In-Progress: </span>
+            <span class="text-red-500 font-medium"
+                >{{ getAllObjectivesUnderADirectorData?.Incompleted }}
+            </span>
+            } @else {
+            <p-skeleton width="12rem" height="2rem"></p-skeleton>
+            }
+        </div>
+    </div>
+
+    <div class="col-12 lg:col-12 xl:col-6">
+        <div class="card flex flex-column align-items-center">
+            <h5 class="text-left w-full">Office Budget</h5>
+            <ng-container
+                *ngIf="pieCharts?.datasets[0]?.data.length; else noData"
+            >
+                <p-chart
+                    [responsive]="true"
+                    type="pie"
+                    [data]="pieCharts"
+                    [options]="PieChartOptions"
+                ></p-chart>
+            </ng-container>
+            <ng-template #noData>
+                <p>😴</p>
+            </ng-template>
+        </div>
+    </div>
+    <div class="col-12 lg:col-12 xl:col-6">
+        <div class="card flex flex-column align-items-center">
+            <h5 class="text-left w-full">Objective Budget</h5>
+            <ng-container
+                *ngIf="
+                    pieChartsBudgetUsed?.datasets[0]?.data.length;
+                    else noData
+                "
+            >
+                <p-chart
+                    [responsive]="true"
+                    type="pie"
+                    [data]="pieChartsBudgetUsed"
+                    [options]="PieChartBudgetUsedOptions"
+                ></p-chart>
+            </ng-container>
+            <ng-template #noData>
+                <p id="emoji" style="font-size: xxx-large">😴</p>
+            </ng-template>
+        </div>
+    </div>
+</div>

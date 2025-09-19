@@ -1,0 +1,220 @@
+<!-- main table department -->
+
+<div class="grid">
+    <div class="col-12">
+        <div class="card">
+            <div class="add-user-heading">
+                <span class="text-xl font-medium mt-2 text-slate-950"
+                    >Departments</span
+                >
+            </div>
+            <p-table
+                #dt1
+                [value]="depts"
+                dataKey="id"
+                [rows]="10"
+                [loading]="loading"
+                [rowHover]="true"
+                styleClass="p-datatable-gridlines"
+                [paginator]="true"
+                [globalFilterFields]="['department', 'status', 'options']"
+                responsiveLayout="scroll"
+            >
+                <ng-template pTemplate="caption">
+                    <div
+                        class="flex justify-content-between flex-column sm:flex-row"
+                    >
+                        <button
+                            pButton
+                            label="Clear"
+                            class="p-button-outlined mb-2"
+                            icon="pi pi-filter-slash"
+                            (click)="clear(dt1)"
+                        ></button>
+
+                        <p-button
+                            icon="pi pi-plus"
+                            (click)="addDept()"
+                            severity="success"
+                            [outlined]="true"
+                            pTooltip="Add Objectives"
+                            tooltipPosition="top"
+                        />
+
+                        <span class="p-input-icon-left mb-2">
+                            <i class="pi pi-search"></i>
+                            <input
+                                pInputText
+                                type="text"
+                                #filter
+                                (input)="onGlobalFilter(dt1, $event)"
+                                placeholder="Search Keyword"
+                                class="p-inputtext p-component p-element w-full"
+                            />
+                        </span>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Department
+                                <p-columnFilter
+                                    type="text"
+                                    field="department"
+                                    display="menu"
+                                    placeholder="Search by Department"
+                                ></p-columnFilter>
+                            </div>
+                        </th>
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Status
+                                <p-columnFilter
+                                    type="text"
+                                    field="status"
+                                    display="menu"
+                                    placeholder="Search by Status"
+                                ></p-columnFilter>
+                            </div>
+                        </th>
+
+                        <th style="min-width: 12rem">
+                            <div
+                                class="flex justify-content-between align-items-center"
+                            >
+                                Options
+                            </div>
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-dept>
+                    <tr>
+                        <td>
+                            {{ dept.department | titlecase }}
+                        </td>
+                        <!-- <td>
+                            {{ dept.status | titlecase }}
+                        </td> -->
+                        <td>
+                            <span
+                                (click)="changeDeptStatus($event, dept.id)"
+                                [class]="
+                                    'cursor-pointer  customer-badge status-' +
+                                    dept.status
+                                "
+                                >{{ dept.status }}</span
+                            >
+                            <p-confirmPopup
+                                #confirmPopupRef
+                                key="updateDepartment"
+                            ></p-confirmPopup>
+                        </td>
+                        <td>
+                            <div class="options-users">
+                                <i
+                                    (click)="updateDept(dept)"
+                                    class="pi pi-file-edit text-xl"
+                                    style="color: #0ea5e9; cursor: pointer"
+                                ></i>
+                                <i
+                                    (click)="deleteDept(dept.id)"
+                                    class="pi pi-trash text-xl"
+                                    style="color: #ef4444; cursor: pointer"
+                                ></i>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage">
+                    <tr>
+                        <td colspan="8">No Department found.</td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="loadingbody">
+                    <tr>
+                        <td colspan="8">
+                            Loading Department data. Please wait.
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+</div>
+
+<!-- change status of department -->
+
+<p-dialog
+    header="Dialog"
+    id="tester"
+    [(visible)]="changeStatusCard"
+    showEffect="fade"
+    [style]="{ width: '20vw' }"
+    [breakpoints]="{ '960px': '50vw' }"
+>
+    <p class="line-height-3 m-0">Change Department Status</p>
+    <ng-template pTemplate="footer">
+        <button
+            pButton
+            icon="pi pi-check"
+            (click)="changeUserStatuExecution()"
+            label="Ok"
+            class="p-button-outlined"
+        ></button>
+    </ng-template>
+</p-dialog>
+
+<!-- add department card dialog -->
+
+<p-dialog
+    [header]="!updatingDept ? 'Add Department' : 'Update '"
+    [(visible)]="cardCrudDialog"
+    [style]="{ width: '25rem' }"
+    (onHide)="cardCrudDialog = false; departmentName = ''; department_head = ''"
+>
+    <div class="flex align-items-center gap-3 mb-5">
+        <input
+            pInputText
+            id="deparment_name"
+            [(ngModel)]="departmentName"
+            class="flex-auto"
+            autocomplete="off"
+            placeholder="Department Name"
+        />
+    </div>
+    <div class="flex-auto align-items-center gap-3 mb-5">
+        <p-dropdown
+            class="w-full flex flex-column"
+            [(ngModel)]="department_head"
+            [options]="allUsers"
+            optionLabel="name"
+            [filter]="true"
+            filterBy="name"
+            [showClear]="true"
+            placeholder="Select a User"
+        />
+    </div>
+    <div class="flex justify-content-end gap-2">
+        <p-button
+            label="Cancel"
+            severity="secondary"
+            (click)="
+                cardCrudDialog = false;
+                departmentName = '';
+                department_head = ''
+            "
+        />
+        <p-button
+            label="Save"
+            [disabled]="departmentName === ''"
+            (click)="
+                !updatingDept ? addDeptDialogExec() : updateDepartmentExec()
+            "
+        />
+    </div>
+</p-dialog>

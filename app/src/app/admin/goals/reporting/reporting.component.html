@@ -1,0 +1,31 @@
+<!-- main table department -->
+
+<div class="grid">
+    <div class="col-12">
+        <div class="card">
+            <div class="add-user-heading">
+                <span class="text-xl font-medium mt-2 text-slate-950"
+                    >Charts</span
+                >
+                <div class="chart-parents" style="max-height: 50vh">
+                    <ngx-charts-bar-vertical-2d
+                        #myBarChart
+                        [groupPadding]="0"
+                        [scheme]="colorScheme"
+                        [results]="multi"
+                        [xAxis]="showXAxis"
+                        [yAxis]="showYAxis"
+                        [legend]="showLegend"
+                        [showXAxisLabel]="showXAxisLabel"
+                        [showYAxisLabel]="showYAxisLabel"
+                        [xAxisLabel]="xAxisLabel"
+                        [yAxisLabel]="yAxisLabel"
+                        [legendTitle]="legendTitle"
+                        [gradient]="gradient"
+                    >
+                    </ngx-charts-bar-vertical-2d>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
