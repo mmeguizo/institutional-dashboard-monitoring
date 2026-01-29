@@ -349,7 +349,9 @@
                                                     goal.department | titlecase
                                                 }}
                                             </td>
-                                            <td>{{ goal.budget | peso }}</td>
+                                          <td>{{ goals | objectiveBudgetSum | peso }}</td>
+                                            <!-- <td>{{ goal.budget | peso }} </td> -->
+
                                         </tr>
                                     </ng-template>
                                     <ng-template pTemplate="emptymessage">

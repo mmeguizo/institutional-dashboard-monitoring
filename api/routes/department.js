@@ -156,7 +156,7 @@ module.exports = (router) => {
   //   if (department.department_head && department.department_head.name) {
   //     departmentData.department_head = department.department_head.name.toLowerCase();
   //   }
-    
+
   //   if (department.department_head && department.department_head.code) {
   //     departmentData.user_id = department.department_head.code.toLowerCase();
   //   }
@@ -280,32 +280,31 @@ module.exports = (router) => {
   //   // );
   // });
 
-
   router.post("/addDepartment", async (req, res) => {
     const { department } = req.body;
 
-    console.log({addDepartment :department});
+    console.log({ addDepartment: department });
 
-    if (!department.departmentName || department.departmentName.trim() === '') {
+    if (!department.departmentName || department.departmentName.trim() === "") {
       return res.json({
         success: false,
         message: "You must provide an Department Name",
       });
     }
 
-    const departmentData = {
+    let departmentData = {
       id: uuidv4(),
       department: department.departmentName.toLowerCase(),
-      department_head : '',
-      user_id : '',
-      
+      department_head: "",
+      user_id: "",
     };
 
     // Add department_head and user_id only if they are provided
     if (department.department_head && department.department_head.name) {
-      departmentData.department_head = department.department_head.name.toLowerCase();
+      departmentData.department_head =
+        department.department_head.name.toLowerCase();
     }
-    
+
     if (department.department_head && department.department_head.code) {
       departmentData.user_id = department.department_head.code.toLowerCase();
     }
@@ -313,7 +312,10 @@ module.exports = (router) => {
     const existingDepartment = await Department.findOne({
       department: department.department,
     });
-    console.log('Existing Department:', JSON.stringify(existingDepartment, null, 2));
+    console.log(
+      "Existing Department:",
+      JSON.stringify(existingDepartment, null, 2)
+    );
 
     if (existingDepartment) {
       return res.json({
@@ -325,38 +327,50 @@ module.exports = (router) => {
     Department.create(departmentData)
       .then((data) => {
         console.log({ departmentDatacreate: data });
-        
+        const departmentHeadUsername = departmentData.department_head;
         // Update the department head user with the new department information
-        User.findOneAndUpdate(
-          { id: data.user_id }, // Find user by department_head username
-          {
-            department: data.department,
-            department_id: data.id
-          },
-          { new: true }
-        )
-          .then(updatedUser => {
-            console.log('Department head updated:', updatedUser);
-            res.json({
-              success: true,
-              message: "This department is successfully Added and department head updated",
-              data: { 
-                department: data.department,
-                departmentId: data.id,
-                updatedUser: updatedUser ? updatedUser.username : 'User not found'
-              },
-            });
-          })
-          .catch(userErr => {
-            console.error('Error updating department head:', userErr);
-            // Still return success for department creation even if user update fails
-            res.json({
-              success: true,
-              message: "Department created but failed to update department head",
-              data: { department: data.department, departmentId: data.id },
-              warning: "Could not update department head: " + userErr.message
-            });
+        if (departmentHeadUsername === "") {
+          res.json({
+            success: true,
+            message: "This department is successfully Added ",
+            data: { department: data.department, departmentId: data.id },
           });
+        } else {
+          User.findOneAndUpdate(
+            { id: data.user_id }, // Find user by department_head username
+            {
+              department: data.department,
+              department_id: data.id,
+            },
+            { new: true }
+          )
+            .then((updatedUser) => {
+              console.log("Department head updated:", updatedUser);
+              res.json({
+                success: true,
+                message:
+                  "This department is successfully Added and department head updated",
+                data: {
+                  department: data.department,
+                  departmentId: data.id,
+                  updatedUser: updatedUser
+                    ? updatedUser.username
+                    : "User not found",
+                },
+              });
+            })
+            .catch((userErr) => {
+              console.error("Error updating department head:", userErr);
+              // Still return success for department creation even if user update fails
+              res.json({
+                success: true,
+                message:
+                  "Department created but failed to update department head",
+                data: { department: data.department, departmentId: data.id },
+                warning: "Could not update department head: " + userErr.message,
+              });
+            });
+        }
       })
       .catch((err) => {
         if (err.code === 11000) {
@@ -376,9 +390,9 @@ module.exports = (router) => {
         }
       });
 
-    let params = JSON.stringify(req.params);
-    let query = JSON.stringify(req.query);
-    let body = JSON.stringify(req.body);
+    // let params = JSON.stringify(req.params);
+    // let query = JSON.stringify(req.query);
+    // let body = JSON.stringify(req.body);
     // logger.info(
     //   ` ${req.method}|${params}|${query}|${req.originalUrl}|${body}|${
     //     req.statusCode
@@ -546,7 +560,7 @@ module.exports = (router) => {
   //   }
   // );
 
-    router.put(
+  router.put(
     "/updateDepartment",
 
     async (req, res) => {
@@ -567,29 +581,34 @@ module.exports = (router) => {
               { username: department.department_head }, // Find user by department_head username
               {
                 department: department.department,
-                department_id: id // Use the department id from the update
+                department_id: id, // Use the department id from the update
               },
               { new: true }
             )
-              .then(updatedUser => {
-                console.log('Department head updated:', updatedUser);
+              .then((updatedUser) => {
+                console.log("Department head updated:", updatedUser);
                 res.json({
                   success: true,
-                  message: "Department Information has been updated and department head updated!",
+                  message:
+                    "Department Information has been updated and department head updated!",
                   data: {
                     department: response,
-                    updatedUser: updatedUser ? updatedUser.username : 'User not found'
+                    updatedUser: updatedUser
+                      ? updatedUser.username
+                      : "User not found",
                   },
                 });
               })
-              .catch(userErr => {
-                console.error('Error updating department head:', userErr);
+              .catch((userErr) => {
+                console.error("Error updating department head:", userErr);
                 // Still return success for department update even if user update fails
                 res.json({
                   success: true,
-                  message: "Department updated but failed to update department head",
+                  message:
+                    "Department updated but failed to update department head",
                   data: response,
-                  warning: "Could not update department head: " + userErr.message
+                  warning:
+                    "Could not update department head: " + userErr.message,
                 });
               });
           } else {
@@ -611,7 +630,6 @@ module.exports = (router) => {
       // );
     }
   );
-  
 
   return router;
 };

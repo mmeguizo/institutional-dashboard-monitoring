@@ -1720,31 +1720,46 @@ module.exports = (router) => {
         },
       ]);
       res.json({ success: true, data: data });
-    } catch (error) {
-      res.json({ success: false, message: error });
+    }catch (error) {
+        console.error("Route error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: error.message,
+            goals: [],
+            office_dropdown: [],
+            GOAL: []
+        });
     }
   });
 
   router.get("/getAllObjectivesWithObjectives/:office", async (req, res) => {
-    const officeName = req.params.office.toLowerCase();
+
+  try {
+
+    console.log("req.params.office", req.params.office);
+
+    const officeName = req.params.office.toLowerCase().trim();
     let matchQuery = {
       deleted: false,
     };
+ 
 
-    console.log("officegetAllObjectivesWithObjectives", officeName);
     let queryIds = [];
     if (officeName && officeName !== "undefined") {
       const department = await Departments.findOne({
         // department: { $regex: officeName, $options: "i" },
         department: officeName,
       }).select({ id: 1 });
-      // }).select({ id: 1, firstname: 1, lastname: 1, role: 1 });
-
       console.log("department", department);
+
+      // }).select({ id: 1, firstname: 1, lastname: 1, role: 1 });
 
       const UsersData = await Users.find({
         department_id: department.id,
       });
+
+      console.log("department.id", department.id);
 
       console.log("UsersData", UsersData);
 
@@ -1781,7 +1796,6 @@ module.exports = (router) => {
       console.log("queryIds", queryIds);
       console.log("matchQuery", matchQuery);
     }
-
     // // const usersUnderThisOffice = await Users.find({
     // //   $or: [{ vice_president_id: officeId }, { director_id: officeId }],
     // // }).select({ id: true, firstname: true, lastname: true });
@@ -1972,6 +1986,18 @@ module.exports = (router) => {
         }
       }
     ).sort({ _id: -1 });
+
+     } catch (error) {
+        console.error("Route error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: error.message,
+            goals: [],
+            office_dropdown: [],
+            GOAL: []
+        });
+    }
   });
 
   // router.get("/getAllObjectivesUnderADirector/:id", async (req, res) => {

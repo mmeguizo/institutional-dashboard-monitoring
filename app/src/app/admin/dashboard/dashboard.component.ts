@@ -199,6 +199,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     async getAllCampusForDashboard() {
         await this.branch.getCampus().then((campus) => {
+            console.log({ campus });
             this.campusList = campus;
         });
     }
@@ -250,6 +251,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
             .subscribe({
                 next: (data: any) => {
                     this.goals = data.goals || [];
+
+                    console.log({ goalsData: this.goals });
+
                     // this.goalBarChartList = data.goalDropdown || [];
                     // this.pieChart(data.goals || this.goals || []);
                     // this.thisBarCharts(data.goals);

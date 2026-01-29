@@ -23,6 +23,7 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { DynamicDialogModule } from 'primeng/dynamicdialog';
 import { AccordionModule } from 'primeng/accordion';
 import {
+    ObjectiveBudgetSumPipe,
     dataFilterPipe,
     NumberWithCommas,
     IsRead,
@@ -72,13 +73,14 @@ import {
     CompletedObjectivesPipe,
     IncompleteObjectivesPipe,
     FormatFrequencyPipe,
-  
+
 } from '../utlis/general.pipes';
 Chart.register(ChartDataLabels);
 
 const pipes = [
     dataFilterPipe,
     NumberWithCommas,
+    ObjectiveBudgetSumPipe,
     IsRead,
     SumPipe,
     AssetsPipe,
@@ -97,7 +99,7 @@ const pipes = [
     CompletedObjectivesPipe,
     IncompleteObjectivesPipe,
     FormatFrequencyPipe,
-    
+
 ];
 
 @NgModule({

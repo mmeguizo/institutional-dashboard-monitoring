@@ -57,6 +57,8 @@ export class DepartmentsComponent implements OnInit, OnDestroy {
     }
 
     async getAllUsers() {
+
+    return new Promise<void>((resolve) => {
         this.user
             .fetch('get', 'users', 'getAllUsersAdminDepartments')
             .pipe(takeUntil(this.getdepartmenttSubscription))
@@ -64,7 +66,9 @@ export class DepartmentsComponent implements OnInit, OnDestroy {
                 console.log(data);
                 this.allUsers = data?.users || [];
                 console.log(this.allUsers);
+                resolve();
             });
+    });
     }
 
     getDepartments() {
@@ -84,8 +88,8 @@ export class DepartmentsComponent implements OnInit, OnDestroy {
         this.updatingDept = false;
     }
 
-    updateDept(dept: any) {
-        this.getAllUsers();
+    async updateDept(dept: any) {
+       await this.getAllUsers();
         console.log({ updateDept: dept });
 
         this.departmentName = dept.department;
@@ -245,13 +249,13 @@ export class DepartmentsComponent implements OnInit, OnDestroy {
         }
         this.loading = true;
         console.log({
-            departmentName: this.departmentName,
+            departmentName: this.departmentName.trim(),
             department_head: this.department_head,
         });
         this.department
             .getRoute('post', 'department', 'addDepartment', {
                 department: {
-                    departmentName: this.departmentName,
+                    departmentName: this.departmentName.trim(),
                     department_head: this.department_head,
                 },
             })

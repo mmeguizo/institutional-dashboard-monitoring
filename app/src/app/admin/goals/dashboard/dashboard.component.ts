@@ -112,29 +112,48 @@ export class GoalDashboardComponent implements OnInit, OnDestroy {
         //         this.objectiveBudget = data.data;
         //     });
     }
-    getAllObjectivesForTable(office?: any) {
+    getAllObjectivesForTable(office?: any ) {
+
+        console.log({ officeSelected: office });
+
         this.goals = [];
 
+        console.log({ officeParam: office });
+        const userOffice = office?.toLowerCase().trim();
+
+        console.log({ userOffice: userOffice });
+
         this.obj
-            .fetch('get', 'goals', `getAllObjectivesWithObjectives/${office}`)
+            .fetch('get', 'goals', `getAllObjectivesWithObjectives/${userOffice}`)
             .pipe(takeUntil(this.dashboardSubscription))
             .subscribe((data: any) => {
                 console.log({ getAllObjectivesForTable: data });
-                this.allObjectiveBudget = data.goals
-                    .map((o: any) =>
-                        o.objectivesDetails
-                            .map((o: any) => o.budget)
-                            .reduce((a: any, b: any) => a + b, 0)
-                    )
-                    .reduce((a: any, b: any) => a + b, 0);
-                this.goals = data.goals;
-                this.calculateBudget(data.goals);
-                this.calculateUsed(data.goals);
-                this.calculateRemaining(data.goals);
-                this.officeList = data.office_dropdown;
-                this.officeListCombine = data.office_dropdown
-                    .map((office: any) => office.name)
-                    .join(', ');
+
+                // Add null-safety checks
+                if (data?.goals && Array.isArray(data.goals)) {
+                    this.allObjectiveBudget = data.goals
+                        .map((o: any) =>
+                            o.objectivesDetails
+                                ?.map((o: any) => o.budget || 0)
+                                .reduce((a: any, b: any) => a + b, 0) || 0
+                        )
+                        .reduce((a: any, b: any) => a + b, 0);
+                    this.goals = data.goals;
+                    this.calculateBudget(data.goals);
+                    this.calculateUsed(data.goals);
+                    this.calculateRemaining(data.goals);
+                }
+
+                // Add null-safety check for office_dropdown
+                if (data?.office_dropdown && Array.isArray(data.office_dropdown)) {
+                    this.officeList = data.office_dropdown;
+                    this.officeListCombine = data.office_dropdown
+                        .map((office: any) => office.name)
+                        .join(', ');
+                } else {
+                    this.officeList = [];
+                    this.officeListCombine = '';
+                }
             });
     }
 
@@ -272,9 +291,12 @@ export class GoalDashboardComponent implements OnInit, OnDestroy {
     }
 
     onChangeOffice(event: any = '') {
+        console.log({ officeChanged: event });
         //reset the goals
         this.goals = [];
-        this.getAllObjectivesForTable(event?.value?.name);
+        const officeName = event?.value?.name.trim() || '';
+        this.getAllObjectivesForTable(officeName);
+        // this.getAllObjectivesForTable(event?.value?.name);
     }
 
     onClearOffice() {

@@ -246,11 +246,18 @@ module.exports = (router) => {
       } = req.body;
 
       // Required field checks
-      if (!email || !username || !password || !firstname || !lastname || !role) {
+      if (
+        !email ||
+        !username ||
+        !password ||
+        !firstname ||
+        !lastname ||
+        !role
+      ) {
         return res.json({
           success: false,
           message: "Missing required fields.",
-          err: "Missing required fields."
+          err: "Missing required fields.",
         });
       }
 
@@ -259,7 +266,7 @@ module.exports = (router) => {
         return res.json({
           success: false,
           message: "Password must be 8-35 characters.",
-            err: "Password must be 8-35 characters."
+          err: "Password must be 8-35 characters.",
         });
       }
 
@@ -267,7 +274,7 @@ module.exports = (router) => {
         return res.json({
           success: false,
           message: "Password confirmation does not match.",
-          err: "Password confirmation does not match."
+          err: "Password confirmation does not match.",
         });
       }
 
@@ -283,92 +290,46 @@ module.exports = (router) => {
         email: email.toLowerCase(),
         username: username.toLowerCase(),
         password: await hash.encryptPassword(rawPwd),
-        department: deptInputTrimmed,
+        department: deptInputTrimmed || "",
         department_id: department_id || "",
         vice_president_name: (vice_president_name || "").trim(),
         vice_president_id: (vice_president_id || "").trim(),
         director_name: (director_name || "").trim(),
         director_id: (director_id || "").trim(),
         campus,
-        role: normalizedRole
+        role: normalizedRole,
       });
 
       let departmentUpdated = false;
 
-      if (deptInputTrimmed) {
-        if (department_id && department_id.trim() !== "") {
-          // Explicit department id supplied: update that department as head
-          try {
-            const updatedDept = await Department.findOneAndUpdate(
-              { id: department_id },
-              {
-                $set: {
-                  department: deptInputTrimmed,
-                  department_head: createdUser.username,
-                  user_id: createdUser.id,
-                  campus
-                }
-              },
-              { new: true }
-            );
-            if (updatedDept) {
-              departmentUpdated = true;
-            }
-          } catch (e) {
-            console.error("Department (by id) update failed:", e.message);
-          }
-        } else {
-          // No department_id: find by name (case-insensitive) or create
-          const existingDepartment = await Department.findOne({
-            department: {
-              $regex: new RegExp(
-                `^${deptInputTrimmed.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")}$`,
-                "i"
-              )
-            }
-          });
+      const existingDepartment = await Department.findOne({
+          id: department_id,
+        });
 
-            if (!existingDepartment) {
-              try {
-                const newDept = await Department.create({
-                  id: uuidv4(),
-                  department: deptInputTrimmed,
-                  department_head: createdUser.username,
-                  user_id: createdUser.id,
-                  campus
-                });
-                await User.updateOne(
-                  { _id: createdUser._id },
-                  { department_id: newDept.id }
-                );
-                departmentUpdated = true;
-              } catch (depErr) {
-                console.error("Department create failed:", depErr.message);
-              }
-            } else {
-              // Attach id if user had none
-              if (!createdUser.department_id) {
-                await User.updateOne(
-                  { _id: createdUser._id },
-                  { department_id: existingDepartment.id }
-                );
-              }
-              // Assign head if vacant
-              if (!existingDepartment.department_head) {
-                await Department.updateOne(
-                  { _id: existingDepartment._id },
-                  {
-                    $set: {
-                      department_head: createdUser.username,
-                      user_id: createdUser.id
-                    }
-                  }
-                );
-                departmentUpdated = true;
-              }
-            }
+        console.log("existingDepartment:", existingDepartment);
+
+      if (existingDepartment) {
+        // Explicit department id supplied: update that department as head
+        try {
+          const updatedDept = await Department.findOneAndUpdate(
+            { id: existingDepartment.id },
+            {
+              $set: {
+                department: deptInputTrimmed,
+                department_head: createdUser.username,
+                user_id: createdUser.id,
+                campus,
+              },
+            },
+            { new: true }
+          );
+          if (updatedDept) {
+            departmentUpdated = true;
+          }
+        } catch (e) {
+          console.error("Department (by id) update failed:", e.message);
         }
-      }
+      } 
 
       return res.json({
         success: true,
@@ -382,15 +343,15 @@ module.exports = (router) => {
           lastname,
           username,
           department: deptInputTrimmed,
-          role: normalizedRole
-        }
+          role: normalizedRole,
+        },
       });
     } catch (err) {
       if (err && err.code === 11000) {
         return res.json({
           success: false,
           message: "Username or email already exists.",
-          err: "Username or email already exists."
+          err: "Username or email already exists.",
         });
       }
 
@@ -400,7 +361,7 @@ module.exports = (router) => {
         return res.json({
           success: false,
           message: firstErr,
-          err: firstErr
+          err: firstErr,
         });
       }
 
@@ -408,7 +369,7 @@ module.exports = (router) => {
       return res.json({
         success: false,
         message: "Could not save user. Error: " + err.message,
-        err: "Could not save user. Error: " + err.message
+        err: "Could not save user. Error: " + err.message,
       });
     }
   });
@@ -544,7 +505,7 @@ module.exports = (router) => {
         req.body.role = "admin";
       }
 
-      let requestBody = { role, ...restData } = req.body
+      let requestBody = ({ role, ...restData } = req.body);
 
       const response = await User.findOneAndUpdate(
         { id: data.id },
@@ -593,9 +554,9 @@ module.exports = (router) => {
         const hashedPassword = await hash.encryptPassword(data.password);
         data.password = hashedPassword;
       }
-      
-      if(req.body.role === 'president'){
-        req.body.role = 'admin'
+
+      if (req.body.role === "president") {
+        req.body.role = "admin";
       }
 
       const response = await User.findOneAndUpdate(

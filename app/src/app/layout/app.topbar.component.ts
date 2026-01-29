@@ -219,12 +219,12 @@ export class AppTopBarComponent implements OnInit {
         ];
 
         this.getUserData();
-        this.dangerousUrl = this.sanitizer.bypassSecurityTrustUrl(
-            this.auth.domain + '/images/no-photo.png'
-        );
         // this.dangerousUrl = this.sanitizer.bypassSecurityTrustUrl(
-        //     this.auth.domain + '/images/' + this.profile_pic || 'no-photo.png'
+        //     this.auth.domain + '/images/no-photo.png'
         // );
+        this.dangerousUrl = this.sanitizer.bypassSecurityTrustUrl(
+            this.auth.domain + '/images/' + this.profile_pic || 'no-photo.png'
+        );
         this.createForm();
 
         this.getAllusers();

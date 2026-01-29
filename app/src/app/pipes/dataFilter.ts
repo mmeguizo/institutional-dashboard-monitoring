@@ -241,3 +241,24 @@ export class MarkdownPipe implements PipeTransform {
         return marked(value); // Await if marked is async
     }
 }
+
+@Pipe({
+    name: 'objectiveBudgetSum',
+})
+export class ObjectiveBudgetSumPipe implements PipeTransform {
+    transform(goals: any[]): number {
+        if (!goals || !Array.isArray(goals)) {
+            return 0;
+        }
+
+        return goals.reduce((total, goal) => {
+            if (goal.objectivesDetails && Array.isArray(goal.objectivesDetails)) {
+                const goalBudgetSum = goal.objectivesDetails
+                    .filter((obj: any) => !obj.deleted)
+                    .reduce((sum: number, obj: any) => sum + (obj.budget || 0), 0);
+                return total + goalBudgetSum;
+            }
+            return total;
+        }, 0);
+    }
+}
