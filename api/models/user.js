@@ -74,4 +74,12 @@ userSchema.methods.comparePassword = function (password) {
   return bcrypt.compare(password, this.password); // this return a promise
 };
 
+// Performance indexes for high-traffic queries
+userSchema.index({ deleted: 1, role: 1 }); // Compound index for filtering by role
+userSchema.index({ director_id: 1, deleted: 1 }); // For director queries
+userSchema.index({ vice_president_id: 1, deleted: 1 }); // For VP queries
+userSchema.index({ department_id: 1, deleted: 1 }); // For department queries
+userSchema.index({ status: 1, deleted: 1 }); // For status filtering
+userSchema.index({ createdAt: -1 }); // For sorting by creation date
+
 module.exports = mongoose.model("User", userSchema);

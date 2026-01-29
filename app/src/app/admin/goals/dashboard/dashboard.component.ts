@@ -20,6 +20,9 @@ interface expandedRows {
     styleUrl: './dashboard.component.scss',
 })
 export class GoalDashboardComponent implements OnInit, OnDestroy {
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
+
     dashboardSubscription = new Subject<void>();
     goals: any[] = [];
     products: Product[] = [];
@@ -91,7 +94,7 @@ export class GoalDashboardComponent implements OnInit, OnDestroy {
     getGoals() {
         this.goal
             .fetch('get', 'goals', 'getGoalsForDashboard')
-            .pipe(takeUntil(this.dashboardSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 console.log({ getGoals: data });
                 this.goalForTables =
@@ -107,7 +110,7 @@ export class GoalDashboardComponent implements OnInit, OnDestroy {
     getAllObjectives() {
         // this.obj
         //     .fetch('get', 'objectives', `getAllObjectivesBudget`)
-        //     .pipe(takeUntil(this.dashboardSubscription))
+        //     .pipe(takeUntil(this.destroy$))
         //     .subscribe((data: any) => {
         //         this.objectiveBudget = data.data;
         //     });
@@ -125,7 +128,7 @@ export class GoalDashboardComponent implements OnInit, OnDestroy {
 
         this.obj
             .fetch('get', 'goals', `getAllObjectivesWithObjectives/${userOffice}`)
-            .pipe(takeUntil(this.dashboardSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 console.log({ getAllObjectivesForTable: data });
 
@@ -160,7 +163,7 @@ export class GoalDashboardComponent implements OnInit, OnDestroy {
     getObjectiveViewPieChart() {
         this.goalService
             .fetch('get', 'goals', `getObjectivesViewTable`)
-            .pipe(takeUntil(this.dashboardSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data?: any) => {
                 console.log(data);
                 this.initBarCharts(data?.goals || []);
@@ -168,7 +171,8 @@ export class GoalDashboardComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.dashboardSubscription.unsubscribe();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
     async initBarCharts(goal?: any) {
         const documentStyle = getComputedStyle(document.documentElement);

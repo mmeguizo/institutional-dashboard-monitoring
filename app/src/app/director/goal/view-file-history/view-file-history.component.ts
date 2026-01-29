@@ -31,7 +31,8 @@ import { getIcon, getFrequencyKeys } from 'src/app/utlis/file-utils';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ViewFileHistoryComponent implements OnInit, OnDestroy {
-    private getGoalSubscription = new Subject<void>(); // Subscription for getting goal
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>(); // Subscription for getting goal
 
     @Input() viewFilesHistory: string;
     viewObjectiveFileHistoryDialogCard: boolean = false;
@@ -82,7 +83,7 @@ export class ViewFileHistoryComponent implements OnInit, OnDestroy {
                     'vice_president_query',
                     `getAllFilesHistoryFromObjectiveLoad/${id}/${objectiveID}`
                 )
-                .pipe(takeUntil(this.getGoalSubscription))
+                .pipe(takeUntil(this.destroy$))
                 .subscribe((data: any) => {
                     this.AllObjectivesHistoryFiles = data.data;
                     this.loading = false;

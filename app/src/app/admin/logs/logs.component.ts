@@ -24,7 +24,8 @@ LogService;
     styleUrl: './logs.component.scss',
 })
 export class LogsComponent {
-    private getdepartmenttSubscription = new Subject<void>();
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
     @ViewChild('filter') filter!: ElementRef;
     logs: any[] = [];
     loading = true;
@@ -54,7 +55,7 @@ export class LogsComponent {
                 'logs',
                 'getAllLogs/' + this.auth.getTokenUserID()
             )
-            .pipe(takeUntil(this.getdepartmenttSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.logs = data.data[0];
                 this.loading = false;

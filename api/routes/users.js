@@ -6,6 +6,7 @@ let bcrypt = require("bcryptjs");
 // const { logger } = require("../middleware/logger");
 const ObjectId = mongoose.Types.ObjectId;
 const Department = require("../models/department");
+const { parsePaginationParams, executePaginatedFind } = require("../utils/pagination");
 
 module.exports = (router) => {
   router.get("/getAllVicePresident", async (req, res) => {
@@ -186,44 +187,39 @@ module.exports = (router) => {
     }
   });
 
-  router.get("/getAllUsersExceptLoggedIn/:id", (req, res) => {
-    User.find(
-      { id: { $ne: req.params.id }, deleted: false },
-      // {
-      //   id: 1,
-      //   email: 1,
-      //   username: 1,
-      //   department: 1,
-      //   role: 1,
-      //   status: 1,
-      //   campus: 1,
-      // },
-      (err, users) => {
-        if (err) {
-          res.json({ success: false, message: err });
-        } else {
-          if (!users) {
-            res.json({ success: false, message: "No User found." });
-          } else {
-            res.json({ success: true, users: users });
-          }
-        }
+  router.get("/getAllUsersExceptLoggedIn/:id", async (req, res) => {
+    try {
+      const paginationParams = parsePaginationParams(req.query);
+      const filter = { id: { $ne: req.params.id }, deleted: false };
+      
+      const { data, pagination } = await executePaginatedFind(
+        User,
+        filter,
+        {},
+        paginationParams,
+        { sort: { _id: -1 } }
+      );
+      
+      if (!data || data.length === 0) {
+        return res.json({ success: false, message: "No User found.", users: [], pagination });
       }
-    ).sort({ _id: -1 });
+      
+      res.json({ success: true, users: data, pagination });
+    } catch (err) {
+      res.json({ success: false, message: err.message });
+    }
   });
 
-  router.post("/findById", (req, res) => {
-    User.findOne({ id: req.body.id }, function (err, user) {
-      if (err) {
-        res.json({ success: false, message: err });
-      } else {
-        if (!user) {
-          res.json({ success: false, message: "No User found." });
-        } else {
-          res.json({ success: true, user: user });
-        }
+  router.post("/findById", async (req, res) => {
+    try {
+      const user = await User.findOne({ id: req.body.id });
+      if (!user) {
+        return res.json({ success: false, message: "No User found." });
       }
-    });
+      res.json({ success: true, user: user });
+    } catch (err) {
+      res.json({ success: false, message: err.message });
+    }
   });
 
   router.post("/addUser", async (req, res) => {

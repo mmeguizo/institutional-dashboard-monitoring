@@ -106,4 +106,9 @@ fileUpload.pre("findOneAndUpdate", async function () {
   }
 });
 
+// Performance indexes for high-traffic queries
+fileUpload.index({ user_id: 1, objective_id: 1 }); // Compound index for user files by objective
+fileUpload.index({ objective_id: 1, status: 1 }); // For objective-based file lookups
+fileUpload.index({ date_added: -1 }); // For sorting by date
+
 module.exports = mongoose.model("File", fileUpload);

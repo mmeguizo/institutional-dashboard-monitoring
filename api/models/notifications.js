@@ -60,4 +60,10 @@ NotificationSchema.virtual('user', {
     },
 });
 
+// Performance indexes for high-traffic queries
+NotificationSchema.index({ userId: 1, isRead: 1 }); // Compound index for user notifications
+NotificationSchema.index({ reciepient: 1, isRead: 1 }); // For recipient-based queries
+NotificationSchema.index({ createdAt: -1 }); // For sorting by creation date
+NotificationSchema.index({ type: 1, userId: 1 }); // For filtering by notification type
+
 module.exports = mongoose.model('Notification', NotificationSchema);

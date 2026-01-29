@@ -33,7 +33,8 @@ import { customTitleCase } from 'src/app/utlis/custom-title-case';
 export class DashboardComponent implements OnInit, OnDestroy {
     users: any;
     goals: any;
-    private getDashboardSubscription = new Subject<void>();
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
     objectivePieData: any;
     objectiveDoughnutData: any;
     chartOptions: any;
@@ -207,7 +208,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     async getAllusers() {
         await this.userService
             .fetch('get', 'users', 'getAllUsersForDashboard')
-            .pipe(takeUntil(this.getDashboardSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.users = data.data[0];
             });
@@ -215,7 +216,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     async getAllGoals() {
         await this.goalService
             .fetch('get', 'goals', 'getGoalsForDashboard')
-            .pipe(takeUntil(this.getDashboardSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.NewGoals = data.data[0];
             });
@@ -224,7 +225,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     async getAllDept() {
         await this.dept
             .getRoute('get', 'department', 'getAllDepartmentForDashboard')
-            .pipe(takeUntil(this.getDashboardSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.deparmentData = data.data[0];
             });
@@ -233,7 +234,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     async getAllObjectives() {
         await this.obj
             .fetch('get', 'objectives', `getAllObjectivesForDashboard`)
-            .pipe(takeUntil(this.getDashboardSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.objectivesData = data.data[0] || [];
             });
@@ -247,7 +248,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 'goals',
                 `getAllObjectivesWithObjectivesForDashboard/${campus}`
             )
-            .pipe(takeUntil(this.getDashboardSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: (data: any) => {
                     this.goals = data.goals || [];
@@ -276,7 +277,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.loading = true;
         this.goalService
             .fetch('get', 'goals', `getAllObjectivesWithObjectivesForCharts`)
-            .pipe(takeUntil(this.getDashboardSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: (data: any) => {
                     this.goals = data?.goals || [];
@@ -301,7 +302,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     async getAllDepartmentForDashboard() {
         await this.dept
             .getRoute('get', 'department', 'getAllDepartmentDropdown')
-            .pipe(takeUntil(this.getDashboardSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.departmentList = data.data[0];
             });
@@ -320,7 +321,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                     'objectives',
                     `getAllObjectivesForDashboardPie/${goal.id}`
                 )
-                .pipe(takeUntil(this.getDashboardSubscription))
+                .pipe(takeUntil(this.destroy$))
                 .subscribe((data: any) => {
                     let { objectivesData } = data.data;
                     this.objectivesSideData = objectivesData;
@@ -426,8 +427,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        this.getDashboardSubscription.next();
-        this.getDashboardSubscription.complete();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     // tab view and panel

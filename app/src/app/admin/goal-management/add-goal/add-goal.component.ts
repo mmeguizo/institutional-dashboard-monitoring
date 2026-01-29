@@ -34,7 +34,8 @@ export class AddGoalComponent implements OnInit {
     products: any[] = [];
     newData: any;
     initialGoalValue: any;
-    private goallistSubscription = new Subject<void>();
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
 
     constructor(
         private formBuilder: FormBuilder,
@@ -138,7 +139,7 @@ export class AddGoalComponent implements OnInit {
 
         this.goallistService
             .getRoute('post', 'goallists', 'addGoal', form.value)
-            .pipe(takeUntil(this.goallistSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: (data: any) => {
                     this.messageService.add({
@@ -167,7 +168,7 @@ export class AddGoalComponent implements OnInit {
                 goals: form.value.goals,
                 objectives: form.value.objectives,
             })
-            .pipe(takeUntil(this.goallistSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: (data: any) => {
                     this.messageService.add({
@@ -200,7 +201,7 @@ export class AddGoalComponent implements OnInit {
 
     ngOnDestroy(): void {
         // Do not forget to unsubscribe the event
-        this.goallistSubscription.next();
-        this.goallistSubscription.complete();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 }

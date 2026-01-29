@@ -9,12 +9,17 @@ const goals = require("../models/goals");
 const Users = require("../models/user");
 const Departments = require("../models/department");
 const Notifications = require("../models/notifications");
+const { parsePaginationParams, createPaginationMeta } = require("../utils/pagination");
 // const { query, log } = require("winston");
 
 module.exports = (router) => {
   router.get("/getObjectivesViewTable", async (req, res) => {
-    Goals.aggregate(
-      [
+    try {
+      const paginationParams = parsePaginationParams(req.query, { defaultLimit: 20 });
+      const { page, limit, skip } = paginationParams;
+      
+      // Base pipeline for filtering
+      const basePipeline = [
         {
           $match: {
             deleted: false,
@@ -164,33 +169,47 @@ module.exports = (router) => {
             },
           },
         },
-      ],
-      { allowDiskUse: true },
-      async (err, Goals) => {
-        // Check if error was found or not
-        if (err) {
-          res.json({ success: false, message: err });
-        } else {
-          if (!Goals || Goals.length === 0) {
-            res.json({
-              success: false,
-              message: "No Goals found.",
-              Goals: [],
-            }); // Return error of no blogs found
-          } else {
-            let returnedData = await Promise.all(
-              await CalculateBudgetAndCompletion(Goals)
-            );
-
-            res.json({
-              success: true,
-              goals: returnedData,
-              // originalData: Goals,
-            }); // Return success and blogs array
-          }
-        }
+        { $sort: { _id: -1 } },
+      ];
+      
+      // Get total count
+      const countResult = await Goals.aggregate([
+        { $match: { deleted: false } },
+        { $count: "total" }
+      ], { allowDiskUse: true });
+      
+      const totalCount = countResult[0]?.total || 0;
+      
+      // Add pagination to pipeline
+      const paginatedPipeline = [
+        ...basePipeline,
+        { $skip: skip },
+        { $limit: limit },
+      ];
+      
+      const goalsData = await Goals.aggregate(paginatedPipeline, { allowDiskUse: true });
+      
+      if (!goalsData || goalsData.length === 0) {
+        return res.json({
+          success: false,
+          message: "No Goals found.",
+          goals: [],
+          pagination: createPaginationMeta(0, page, limit),
+        });
       }
-    ).sort({ _id: -1 });
+      
+      const returnedData = await Promise.all(
+        await CalculateBudgetAndCompletion(goalsData)
+      );
+      
+      res.json({
+        success: true,
+        goals: returnedData,
+        pagination: createPaginationMeta(totalCount, page, limit),
+      });
+    } catch (err) {
+      res.json({ success: false, message: err.message });
+    }
   });
 
   router.get("/getGoalForCreatingObjective/:goal_id", async (req, res) => {

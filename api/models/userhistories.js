@@ -17,4 +17,9 @@ const userHistory = new Schema(
   }
 );
 
+// Performance indexes for high-traffic queries
+userHistory.index({ userId: 1, timestamp: -1 }); // For user activity history
+userHistory.index({ activityType: 1, timestamp: -1 }); // For activity type filtering
+userHistory.index({ timestamp: -1 }); // For sorting by time
+
 module.exports = mongoose.model("userHistory", userHistory);

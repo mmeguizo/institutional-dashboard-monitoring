@@ -18,7 +18,8 @@ import { AuthService } from 'src/app/demo/service/auth.service';
     styleUrl: './goal-table.component.scss',
 })
 export class GoalTableComponent implements OnInit, OnDestroy {
-    private getGoalTableSubscription = new Subject<void>();
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
     @Input() editObjective = new EventEmitter<any>();
     @Input() addedaGoal = new EventEmitter<any>();
     @Input() editedAGoal = new EventEmitter<any>();
@@ -69,7 +70,8 @@ export class GoalTableComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        this.getGoalTableSubscription.unsubscribe();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     goalsTableData(userId?: string) {
@@ -82,7 +84,7 @@ export class GoalTableComponent implements OnInit, OnDestroy {
                 `getAllObjectivesWithObjectivesTableOfficeHead/${userId}`
             )
             .pipe(
-                takeUntil(this.getGoalTableSubscription),
+                takeUntil(this.destroy$),
                 tap((data: any) => {
                     this.goals = data.goals;
                     this.loading = false;
@@ -129,7 +131,7 @@ export class GoalTableComponent implements OnInit, OnDestroy {
             accept: () => {
                 this.goal
                     .fetch('put', 'goals', 'deleteGoals', { _id: _id })
-                    .pipe(takeUntil(this.getGoalTableSubscription))
+                    .pipe(takeUntil(this.destroy$))
                     .subscribe((data: any) => {
                         if (data.success) {
                             this.messageService.add({

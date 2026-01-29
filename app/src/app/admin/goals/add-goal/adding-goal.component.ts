@@ -30,7 +30,8 @@ import { customTitleCase } from 'src/app/utlis/custom-title-case';
 export class AddingGoalComponent implements OnInit, OnDestroy {
     @Input() addNewGoal: string;
     @Output() childAddGoalEvent = new EventEmitter<object>();
-    private addGoalSubscription = new Subject<void>();
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
     public addGoalform: FormGroup;
     formGroupDemo: any;
     deptDropdownValue: any[] = [];
@@ -79,7 +80,7 @@ export class AddingGoalComponent implements OnInit, OnDestroy {
     getAllCampuses() {
         this.camp
             .fetch('get', 'campus', 'getAllCampus')
-            .pipe(takeUntil(this.addGoalSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: (data: any) => {
                     this.deptDropdownCampusValue = data.data[0];
@@ -97,7 +98,7 @@ export class AddingGoalComponent implements OnInit, OnDestroy {
     getAllGoallistsDropdown() {
         this.goallistService
             .getRoute('get', 'goallists', 'getAllGoallistsDropdown')
-            .pipe(takeUntil(this.addGoalSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: (data: any) => {
                     this.deptDropdownGoalListValue = data.data[0].map(
@@ -130,7 +131,7 @@ export class AddingGoalComponent implements OnInit, OnDestroy {
     getAllDept() {
         this.dept
             .getRoute('get', 'department', 'getAllDepartmentDropdown')
-            .pipe(takeUntil(this.addGoalSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: (data: any) => {
                     this.deptDropdownValue = data.data[0];
@@ -187,7 +188,7 @@ export class AddingGoalComponent implements OnInit, OnDestroy {
         }
         this.goal
             .fetch('post', 'goals', 'addGoals', data)
-            .pipe(takeUntil(this.addGoalSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 if (data.success) {
                     // this.getAllObjectivesWithObjectives();
@@ -235,7 +236,7 @@ export class AddingGoalComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.addGoalSubscription.next();
-        this.addGoalSubscription.complete();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 }

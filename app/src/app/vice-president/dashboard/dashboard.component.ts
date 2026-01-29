@@ -60,7 +60,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     calendarVisible = signal(true);
     goalBarChartList: IdepartmentDashboardDropdown[] | undefined;
 
-    private objectiveSubscription = new Subject<void>();
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
 
     // currentEvents = signal<EventApi[]>([]);
     loading = true;
@@ -71,7 +72,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     PieChartOptions: any;
     goals: any;
-    private getDashboardSubscription = new Subject<void>();
+    
     objectivePieData: any;
     objectiveDoughnutData: any;
     chartOptions: any;
@@ -148,7 +149,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 'vice_president_query',
                 `getAllObjectivesUnderAVicePresident/${this.USERID}`
             )
-            .pipe(takeUntil(this.objectiveSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.getAllObjectivesUnderAVicePresidentData = data;
                 this.completedGoalsFromApi = data.completedGoals;
@@ -168,7 +169,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 'vice_president_query',
                 `getAllUsersForDashboardVP/${this.USERID}`
             )
-            .pipe(takeUntil(this.objectiveSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.users = data.data;
             });
@@ -359,7 +360,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 'vice_president_query',
                 `getAllObjectivesWithObjectivesForCharts/${this.USERID}`
             )
-            .pipe(takeUntil(this.getDashboardSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: (data: any) => {
                     console.log({
@@ -909,7 +910,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.objectiveSubscription.unsubscribe();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 }
 
@@ -942,7 +944,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     //             'objectives',
     //             `getObjectiveForCalendar/${this.userId}`
     //         )
-    //         .pipe(takeUntil(this.objectiveSubscription))
+    //         .pipe(takeUntil(this.destroy$))
     //         .subscribe((data: any) => {
     //             const events = this.transformEvents(data.data);
     //             this.updateCalendarEvents(events);

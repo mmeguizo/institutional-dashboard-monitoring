@@ -29,7 +29,8 @@ import { validateFileType, getIcon } from 'src/app/utlis/file-utils';
     styleUrl: './objectives.component.scss',
 })
 export class ObjectivesComponent implements OnInit, OnDestroy {
-    private objectiveSubscription = new Subject<void>();
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
     ref: DynamicDialogRef | undefined;
     @ViewChild('filter') filter!: ElementRef;
 
@@ -101,7 +102,7 @@ export class ObjectivesComponent implements OnInit, OnDestroy {
         this.loading = true;
         this.obj
             .fetch('get', 'objectives', 'getAllObjectives')
-            .pipe(takeUntil(this.objectiveSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.objectiveDatas = data.Objectives;
 
@@ -117,7 +118,7 @@ export class ObjectivesComponent implements OnInit, OnDestroy {
         this.loading = true;
         this.obj
             .fetch('get', 'objectives', 'getAllByIdObjectivesWithGoalsAndUsers')
-            .pipe(takeUntil(this.objectiveSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.objectiveDatas = data.data;
                 this.loading = false;
@@ -171,7 +172,7 @@ export class ObjectivesComponent implements OnInit, OnDestroy {
                     .fetch('put', 'objectives', 'updateobjectivecompletion', {
                         id: data.id,
                     })
-                    .pipe(takeUntil(this.objectiveSubscription))
+                    .pipe(takeUntil(this.destroy$))
                     .subscribe(async (results: any) => {
                         if (results.success) {
                             this.messageService.add({
@@ -236,7 +237,7 @@ export class ObjectivesComponent implements OnInit, OnDestroy {
         this.loading = true;
         this.fileService
             .getAllFilesFromObjective(id, objectiveID)
-            .pipe(takeUntil(this.objectiveSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.AllObjectivesFiles = data.data;
                 this.loading = false;
@@ -264,7 +265,7 @@ export class ObjectivesComponent implements OnInit, OnDestroy {
                 this.objectiveIDforFile,
                 this.uploadedFiles
             )
-            .pipe(takeUntil(this.objectiveSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 // after adding files it did not add the new files just reload, clear the data to fix the issue
                 this.AllObjectivesFiles = [];
@@ -342,7 +343,7 @@ export class ObjectivesComponent implements OnInit, OnDestroy {
             this.formGroupDropdown.value.selectedDropdown.name;
         this.obj
             .fetch('put', 'objectives', 'updateObjectives', form.value)
-            .pipe(takeUntil(this.objectiveSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 if (data.success) {
                     // this.getAllObjectivesWithObjectives();
@@ -382,7 +383,7 @@ export class ObjectivesComponent implements OnInit, OnDestroy {
         this.loading = true;
         this.fileService
             .getAllFilesHistoryFromObjectiveLoad(id, objectiveID)
-            .pipe(takeUntil(this.objectiveSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.AllObjectivesHistoryFiles = data.data;
                 this.loading = false;
@@ -408,7 +409,7 @@ export class ObjectivesComponent implements OnInit, OnDestroy {
                     .fetch('put', 'objectives', 'setInactiveObjectives', {
                         id: id,
                     })
-                    .pipe(takeUntil(this.objectiveSubscription))
+                    .pipe(takeUntil(this.destroy$))
                     .subscribe((data: any) => {
                         if (data.success) {
                             this.getAllobjectives();
@@ -445,7 +446,7 @@ export class ObjectivesComponent implements OnInit, OnDestroy {
                         id: id,
                         source: source,
                     })
-                    .pipe(takeUntil(this.objectiveSubscription))
+                    .pipe(takeUntil(this.destroy$))
                     .subscribe((data: any) => {
                         if (data.success) {
                             this.getAllobjectives();
@@ -479,6 +480,7 @@ export class ObjectivesComponent implements OnInit, OnDestroy {
     }
     ngOnDestroy(): void {
         // Do not forget to unsubscribe the event
-        this.objectiveSubscription.unsubscribe();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 }

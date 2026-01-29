@@ -45,7 +45,8 @@ export class EditObjectiveComponent implements OnInit, OnDestroy {
     dropdwonSelection: { name: string; code: string }[];
     dropdwonGoallistSelection: { name: string; code: string }[];
     USERID: string;
-    private updateObjectiveSubscription = new Subject<void>();
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
     subObjectiveGoalID: string;
     goal_ObjectId: string;
     customFunctionalName: string;
@@ -128,8 +129,8 @@ export class EditObjectiveComponent implements OnInit, OnDestroy {
         this.uploadSuccessFlag = false;
     }
     ngOnDestroy(): void {
-        this.updateObjectiveSubscription.next();
-        this.updateObjectiveSubscription.complete();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     async ngOnChanges(changes: SimpleChanges) {
@@ -197,7 +198,7 @@ export class EditObjectiveComponent implements OnInit, OnDestroy {
     async getObjectiveById(id: string, frequency_monitoring: string) {
         this.obj
             .fetch('get', 'objectives', `getObjectiveById/${id}`)
-            .pipe(takeUntil(this.updateObjectiveSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.objectiveDatas = data.data;
                 this.onFrequencyChange(frequency_monitoring, data.data);
@@ -287,7 +288,7 @@ export class EditObjectiveComponent implements OnInit, OnDestroy {
 
         this.obj
             .fetch('put', 'objectives', 'updateObjectives', data)
-            .pipe(takeUntil(this.updateObjectiveSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 if (data.success) {
                     //close the objective table

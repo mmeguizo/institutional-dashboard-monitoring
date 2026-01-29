@@ -40,7 +40,8 @@ import { CampusService } from 'src/app/demo/service/campus.service';
     styleUrl: './goals.component.scss',
 })
 export class GoalsComponent implements OnInit, OnDestroy {
-    private getGoalSubscription = new Subject<void>();
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
     @ViewChild('filter') filter!: ElementRef;
     @ViewChild(PrintTableComponent) printTableComponent: PrintTableComponent;
     @Output() remarksEvent = new EventEmitter<any>();
@@ -210,8 +211,13 @@ export class GoalsComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        // Do not forget to unsubscribe the event
-        this.getGoalSubscription.unsubscribe();
+        // Properly complete the subject to unsubscribe all subscriptions
+        this.destroy$.next();
+        this.destroy$.complete();
+        // Clear interval if running
+        if (this.interval) {
+            clearInterval(this.interval);
+        }
     }
 
     createAddGoalForm() {
@@ -257,7 +263,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
     getAllCampuses() {
         this.camp
             .fetch('get', 'campus', 'getAllCampus')
-            .pipe(takeUntil(this.getGoalSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.deptDropdownCampusValue = data.data[0];
             });
@@ -270,7 +276,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
         this.goal
             .fetch('get', 'goals', 'getAllObjectivesWithObjectives')
             .pipe(
-                takeUntil(this.getGoalSubscription),
+                takeUntil(this.destroy$),
                 tap((data: any) => {
                     this.goals = data.goals;
                     this.loading = false;
@@ -295,7 +301,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
     getAllDept() {
         this.dept
             .getRoute('get', 'department', 'getAllDepartmentDropdown')
-            .pipe(takeUntil(this.getGoalSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.deptDropdownValue = data?.data[0];
             });
@@ -334,7 +340,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
             this.loading = true;
             this.obj
                 .fetch('get', 'objectives', `getAllByIdObjectives/${id}`)
-                .pipe(takeUntil(this.getGoalSubscription))
+                .pipe(takeUntil(this.destroy$))
                 .subscribe(async (data: any) => {
                     console.log(data);
                     this.objectiveDatas = data.Objectives;
@@ -349,7 +355,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
             this.loading = true;
             this.obj
                 .fetch('get', 'objectives', `getAllByIdObjectives/${id}`)
-                .pipe(takeUntil(this.getGoalSubscription))
+                .pipe(takeUntil(this.destroy$))
                 .subscribe((data: any) => {
                     this.objectiveDatas = data.Objectives;
                     this.goalBudget = data.budget;
@@ -373,7 +379,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
             this.loading = true;
             this.fileService
                 .getAllFilesFromObjective(id, objectiveID)
-                .pipe(takeUntil(this.getGoalSubscription))
+                .pipe(takeUntil(this.destroy$))
                 .subscribe((data: any) => {
                     this.AllObjectivesFiles = data.data;
                     this.loading = false;
@@ -392,7 +398,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
         this.loading = true;
         this.fileService
             .getAllFilesHistoryFromObjectiveLoad(id, objectiveID)
-            .pipe(takeUntil(this.getGoalSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.AllObjectivesHistoryFiles = data.data;
                 this.changeDetectorRef.detectChanges();
@@ -455,7 +461,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
             accept: () => {
                 this.goal
                     .fetch('put', 'goals', 'deleteGoals', { _id: _id })
-                    .pipe(takeUntil(this.getGoalSubscription))
+                    .pipe(takeUntil(this.destroy$))
                     .subscribe((data: any) => {
                         if (data.success) {
                             this.getAllObjectivesWithObjectives();
@@ -490,7 +496,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
                     .fetch('put', 'objectives', 'setInactiveObjectives', {
                         id: id,
                     })
-                    .pipe(takeUntil(this.getGoalSubscription))
+                    .pipe(takeUntil(this.destroy$))
                     .subscribe((data: any) => {
                         if (data.success) {
                             this.getObjectivesReload(goalId);
@@ -529,7 +535,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
                         id: id,
                         source: source,
                     })
-                    .pipe(takeUntil(this.getGoalSubscription))
+                    .pipe(takeUntil(this.destroy$))
                     .subscribe((data: any) => {
                         if (data.success) {
                             this.getAllFilesFromObjectiveLoad(

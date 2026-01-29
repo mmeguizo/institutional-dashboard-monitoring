@@ -15,7 +15,7 @@ import {
     transition,
     trigger,
 } from '@angular/animations';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { MenuService } from './app.menu.service';
 import { LayoutService } from './service/app.layout.service';
@@ -125,6 +125,9 @@ import { LayoutService } from './service/app.layout.service';
     ],
 })
 export class AppMenuitemComponent implements OnInit, OnDestroy {
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
+
     @Input() item: any;
 
     @Input() index!: number;
@@ -240,11 +243,13 @@ export class AppMenuitemComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         if (this.menuSourceSubscription) {
-            this.menuSourceSubscription.unsubscribe();
+            this.destroy$.next();
+        this.destroy$.complete();
         }
 
         if (this.menuResetSubscription) {
-            this.menuResetSubscription.unsubscribe();
+            this.destroy$.next();
+        this.destroy$.complete();
         }
     }
 }

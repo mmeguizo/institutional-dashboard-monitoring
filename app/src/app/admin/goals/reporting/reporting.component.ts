@@ -41,7 +41,8 @@ export class ReportingComponent implements OnInit, OnDestroy {
         ],
     };
     loading: boolean = false;
-    private getDashboardSubscription = new Subject<void>();
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
 
     constructor(
         private goalService: GoalService,
@@ -61,7 +62,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
                 'goals',
                 `getAllObjectivesWithObjectivesForBarChartsDashboard/${campus}`
             )
-            .pipe(takeUntil(this.getDashboardSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: (data: any) => {
                     this.multi = data.multi;
@@ -80,7 +81,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        this.getDashboardSubscription.next();
-        this.getDashboardSubscription.complete();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 }

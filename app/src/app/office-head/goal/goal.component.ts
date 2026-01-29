@@ -16,7 +16,8 @@ import { Subject, pipe, takeUntil } from 'rxjs';
     styleUrl: './goal.component.scss',
 })
 export class GoalComponent implements OnInit, OnDestroy {
-    private deleteGoalSubscription = new Subject<void>();
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
     //add goal
     parentAddnewGoal: object = {};
     parentEmitAddnewGoal: object = {};
@@ -59,8 +60,8 @@ export class GoalComponent implements OnInit, OnDestroy {
     ngOnInit() {}
 
     ngOnDestroy(): void {
-        this.deleteGoalSubscription.next();
-        this.deleteGoalSubscription.complete();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
     receivedAddGoalEvent(event: any) {
         if (event?.success) {

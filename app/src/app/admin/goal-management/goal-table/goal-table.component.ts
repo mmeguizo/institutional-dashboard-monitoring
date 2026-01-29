@@ -29,7 +29,8 @@ export class GoalTableComponent implements OnDestroy, OnChanges {
     loading: boolean = false;
     position: string = 'top';
 
-    private goalTableSubscription = new Subject<void>();
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
 
     // expanded table var
     expandedRows: expandedRows = {};
@@ -83,7 +84,7 @@ export class GoalTableComponent implements OnDestroy, OnChanges {
         this.loading = true;
         this.goalService
             .fetch('get', 'goallists', 'getAllGoalLists')
-            .pipe(takeUntil(this.goalTableSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: (data: any) => {
                     this.goals = data.data[0] || [];
@@ -120,7 +121,7 @@ export class GoalTableComponent implements OnDestroy, OnChanges {
                         .fetch('put', 'goallists', 'deleteGoalLists', {
                             id: id,
                         })
-                        .pipe(takeUntil(this.goalTableSubscription))
+                        .pipe(takeUntil(this.destroy$))
                         .subscribe({
                             next: (data: any) => {
                                 if (data.success) {
@@ -170,7 +171,7 @@ export class GoalTableComponent implements OnDestroy, OnChanges {
 
     ngOnDestroy(): void {
         // Do not forget to unsubscribe the event
-        this.goalTableSubscription.next();
-        this.goalTableSubscription.complete();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 }

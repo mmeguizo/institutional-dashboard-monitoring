@@ -5,7 +5,7 @@ import {
     ElementRef,
     ViewChild,
 } from '@angular/core';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, finalize } from 'rxjs';
 import { Table } from 'primeng/table';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { FormBuilder, Validators } from '@angular/forms';
@@ -18,7 +18,8 @@ import { UserService } from 'src/app/demo/service/user.service';
     styleUrl: './departments.component.scss',
 })
 export class DepartmentsComponent implements OnInit, OnDestroy {
-    private getdepartmenttSubscription = new Subject<void>();
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
     @ViewChild('filter') filter!: ElementRef;
 
     depts: any[] = [];
@@ -42,7 +43,6 @@ export class DepartmentsComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.getDepartments();
-        // this.getAllUsers();
 
         this.cols = [
             { field: 'department', header: 'Department' },
@@ -52,33 +52,51 @@ export class DepartmentsComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        // Do not forget to unsubscribe the event
-        this.getdepartmenttSubscription.unsubscribe();
+        // Properly complete the subject to unsubscribe all subscriptions
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     async getAllUsers() {
-
-    return new Promise<void>((resolve) => {
-        this.user
-            .fetch('get', 'users', 'getAllUsersAdminDepartments')
-            .pipe(takeUntil(this.getdepartmenttSubscription))
-            .subscribe((data: any) => {
-                console.log(data);
-                this.allUsers = data?.users || [];
-                console.log(this.allUsers);
-                resolve();
-            });
-    });
+        return new Promise<void>((resolve) => {
+            this.user
+                .fetch('get', 'users', 'getAllUsersAdminDepartments')
+                .pipe(takeUntil(this.destroy$))
+                .subscribe({
+                    next: (data: any) => {
+                        this.allUsers = data?.users || [];
+                        resolve();
+                    },
+                    error: (err) => {
+                        console.error('Error fetching users:', err);
+                        this.allUsers = [];
+                        resolve();
+                    }
+                });
+        });
     }
 
     getDepartments() {
+        this.loading = true;
         this.department
             .getRoute('get', 'department', 'getAllDepartment')
-            .pipe(takeUntil(this.getdepartmenttSubscription))
-            .subscribe((data: any) => {
-                this.depts = data.departments;
-                console.log({ getDepartments: this.depts });
-                this.loading = false;
+            .pipe(
+                takeUntil(this.destroy$),
+                finalize(() => this.loading = false)
+            )
+            .subscribe({
+                next: (data: any) => {
+                    this.depts = data.departments || [];
+                },
+                error: (err) => {
+                    console.error('Error fetching departments:', err);
+                    this.depts = [];
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Failed to load departments',
+                    });
+                }
             });
     }
 
@@ -89,7 +107,7 @@ export class DepartmentsComponent implements OnInit, OnDestroy {
     }
 
     async updateDept(dept: any) {
-       await this.getAllUsers();
+        await this.getAllUsers();
         console.log({ updateDept: dept });
 
         this.departmentName = dept.department;
@@ -135,7 +153,7 @@ export class DepartmentsComponent implements OnInit, OnDestroy {
                 department_head: this.department_head?.name,
                 user_id: this.department_head?.code,
             })
-            .pipe(takeUntil(this.getdepartmenttSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.cardCrudDialog = false;
                 this.getDepartments();
@@ -166,7 +184,7 @@ export class DepartmentsComponent implements OnInit, OnDestroy {
                     .getRoute('put', 'department', 'deleteDepartment', {
                         id: id,
                     })
-                    .pipe(takeUntil(this.getdepartmenttSubscription))
+                    .pipe(takeUntil(this.destroy$))
                     .subscribe((data: any) => {
                         this.getDepartments();
                         this.messageService.add({
@@ -203,7 +221,7 @@ export class DepartmentsComponent implements OnInit, OnDestroy {
                     .getRoute('put', 'department', 'changeDepartmentStatus', {
                         id: id,
                     })
-                    .pipe(takeUntil(this.getdepartmenttSubscription))
+                    .pipe(takeUntil(this.destroy$))
                     .subscribe((data: any) => {
                         this.getDepartments();
                         this.messageService.add({
@@ -259,7 +277,7 @@ export class DepartmentsComponent implements OnInit, OnDestroy {
                     department_head: this.department_head,
                 },
             })
-            .pipe(takeUntil(this.getdepartmenttSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.cardCrudDialog = false;
                 this.getDepartments();

@@ -121,7 +121,8 @@ export class AppTopBarComponent implements OnInit {
     users: any[] = [];
     notificationCount: number = 0;
     notifications: any[] = [];
-    private getSubscription = new Subject<void>();
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
     userData: any;
     public form: any;
     id: string;
@@ -155,7 +156,7 @@ export class AppTopBarComponent implements OnInit {
     // products: Product[] = [];
     selectedProduct: Product = {};
     loading = true;
-    private getUserSubscription = new Subject<void>();
+    
 
     notificationDialogVisible: boolean = false;
     selectedNotification: any;
@@ -245,10 +246,8 @@ export class AppTopBarComponent implements OnInit {
         document.removeEventListener('visibilitychange', this.visibilityHandler);
         window.removeEventListener('focus', this.focusHandler);
         window.removeEventListener('storage', this.storageHandler);
-        this.getSubscription.next();
-        this.getSubscription.complete();
-        this.getUserSubscription.next();
-        this.getUserSubscription.complete();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     // Lightweight: fetch only counts / minimal info to update badge
@@ -308,7 +307,7 @@ export class AppTopBarComponent implements OnInit {
                 'users',
                 `getAllUsersExceptLoggedIn/${this.auth.getTokenUserID()}`
             )
-            .pipe(takeUntil(this.getUserSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 console.log({ getAllusers: data });
                 this.users = data.users;
@@ -343,7 +342,7 @@ export class AppTopBarComponent implements OnInit {
     getUserData() {
         this.user
             .fetch('get', 'users', 'profile', this.id)
-            .pipe(takeUntil(this.getSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.form = this.formBuilder.group({
                     firstname: [data.user.firstname, [Validators.required]],
@@ -406,7 +405,7 @@ export class AppTopBarComponent implements OnInit {
         }
         this.user
             .fetch('put', 'users', 'updateProfile', data)
-            .pipe(takeUntil(this.getSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 if (data.success) {
                     this.messageService.add({
@@ -441,7 +440,7 @@ export class AppTopBarComponent implements OnInit {
                     fd.append('avatar', file, file.name);
                     this.file
                         .addAvatar(fd)
-                        .pipe(takeUntil(this.getSubscription))
+                        .pipe(takeUntil(this.destroy$))
                         .subscribe((data: any) => {
                             this.elEventListenerActive = false;
                             this.profile_pic = data.data.source;

@@ -7,106 +7,98 @@ const comparePassword = require("../models/validators/password-compare");
 // const { logger, logMiddleware } = require("../middleware/logger");
 
 module.exports = (router) => {
-  router.post("/register", (req, res) => {
-    const { email, username, password, confirm } = req.body;
-    if (!email)
-      return res.json({ success: false, message: "You must provide an email" });
-    if (!username)
-      return res.json({
-        success: false,
-        message: "You must provide an username",
-      });
-    if (!password)
-      return res.json({ success: false, message: "Provide a Password" });
-    if (!confirm)
-      return res.json({
-        success: false,
-        message: "Provide a Matching Password",
-      });
-    if (password !== confirm)
-      return res.json({ success: false, message: "Password not match" });
+  router.post("/register", async (req, res) => {
+    try {
+      const { email, username, password, confirm } = req.body;
+      if (!email)
+        return res.json({ success: false, message: "You must provide an email" });
+      if (!username)
+        return res.json({
+          success: false,
+          message: "You must provide an username",
+        });
+      if (!password)
+        return res.json({ success: false, message: "Provide a Password" });
+      if (!confirm)
+        return res.json({
+          success: false,
+          message: "Provide a Matching Password",
+        });
+      if (password !== confirm)
+        return res.json({ success: false, message: "Password not match" });
 
-    let user = new User({
-      id: uuidv4(),
-      email: req.body.email.toLowerCase(),
-      username: req.body.username.toLowerCase(),
-      password: req.body.password,
-      role: "user",
-    });
+      const user = new User({
+        id: uuidv4(),
+        email: req.body.email.toLowerCase(),
+        username: req.body.username.toLowerCase(),
+        password: req.body.password,
+        role: "user",
+      });
 
-    user.save((err, data) => {
-      if (err) {
-        if (err.code === 11000) {
-          res.json({
-            success: false,
-            message: "User name or Email already exists ",
-            err: err.message,
-          });
-        } else {
-          const errors = Object.keys(err.errors || {});
-          if (errors.length) {
-            const error = err.errors[errors[0]];
-            res.json({
-              success: false,
-              message: error.message,
-            });
-          } else {
-            res.json({
-              success: false,
-              message: "Could not save user Error : ",
-              err,
-            });
-          }
-        }
-      } else {
-        res.json({
-          success: true,
-          message: "Account Registered successfully",
-          data: { email: data.email, username: data.username },
+      const data = await user.save();
+      res.json({
+        success: true,
+        message: "Account Registered successfully",
+        data: { email: data.email, username: data.username },
+      });
+    } catch (err) {
+      if (err.code === 11000) {
+        return res.json({
+          success: false,
+          message: "User name or Email already exists",
+          err: err.message,
         });
       }
-    });
-    // res.send('POST in authetication')
-  });
-
-  router.get("/checkEmail/:email", (req, res) => {
-    if (!req.params.email) {
-      res.json({ success: false, message: "Email not provided " });
-    } else {
-      User.findOne({ email: req.params.email }, (err, email) => {
-        if (err) {
-          res.json({ success: false, message: err });
-        } else {
-          if (email) {
-            res.json({ success: false, message: "Email already taken" });
-          } else {
-            res.json({ success: true, message: "Email available" });
-          }
-        }
+      const errors = Object.keys(err.errors || {});
+      if (errors.length) {
+        const error = err.errors[errors[0]];
+        return res.json({
+          success: false,
+          message: error.message,
+        });
+      }
+      res.json({
+        success: false,
+        message: "Could not save user Error",
+        err: err.message,
       });
     }
   });
 
-  router.get("/checkUsername/:username", (req, res) => {
-    if (!req.params.username) {
-      res.json({ success: false, message: "Email not provided " });
-    } else {
-      User.findOne({ username: req.params.username }, (err, username) => {
-        if (err) {
-          res.json({ success: false, message: err });
-        } else {
-          if (username) {
-            res.json({ success: false, message: "Username already taken" });
-          } else {
-            res.json({ success: true, message: "Username available" });
-          }
-        }
-      });
+  router.get("/checkEmail/:email", async (req, res) => {
+    try {
+      if (!req.params.email) {
+        return res.json({ success: false, message: "Email not provided" });
+      }
+      
+      const email = await User.findOne({ email: req.params.email });
+      if (email) {
+        return res.json({ success: false, message: "Email already taken" });
+      }
+      res.json({ success: true, message: "Email available" });
+    } catch (err) {
+      res.json({ success: false, message: err.message });
+    }
+  });
+
+  router.get("/checkUsername/:username", async (req, res) => {
+    try {
+      if (!req.params.username) {
+        return res.json({ success: false, message: "Username not provided" });
+      }
+      
+      const username = await User.findOne({ username: req.params.username });
+      if (username) {
+        return res.json({ success: false, message: "Username already taken" });
+      }
+      res.json({ success: true, message: "Username available" });
+    } catch (err) {
+      res.json({ success: false, message: err.message });
     }
   });
 
   // new login with network down response
-  router.post("/login", (req, res) => {
+  router.post("/login", async (req, res) => {
     const { email, password } = req.body;
     if (!email)
       return res.json({ success: false, message: "No email was provided" });

@@ -8,8 +8,32 @@ import {
 import { ConnectionService } from './connection.service';
 import { AuthService } from './auth.service';
 import { MessageService } from 'primeng/api';
-import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { throwError, Observable } from 'rxjs';
+import { CacheService } from './cache.service';
+
+/** Pagination parameters interface */
+export interface PaginationParams {
+    page?: number;
+    limit?: number;
+}
+
+/** Paginated response interface */
+export interface PaginatedResponse<T> {
+    success: boolean;
+    data?: T[];
+    departments?: T[];
+    pagination?: {
+        currentPage: number;
+        totalPages: number;
+        totalCount: number;
+        limit: number;
+        hasNextPage: boolean;
+        hasPrevPage: boolean;
+    };
+    message?: string;
+}
+
 @Injectable({
     providedIn: 'root',
 })
@@ -22,7 +46,8 @@ export class DepartmentService {
         public auth: AuthService,
         public cs: ConnectionService,
         private http: HttpClient,
-        private messageService: MessageService
+        private messageService: MessageService,
+        private cacheService: CacheService
     ) {}
 
     createAuthenticationHeaders() {
@@ -57,4 +82,46 @@ export class DepartmentService {
                 })
             );
     }
+
+    /**
+     * Get all departments with caching
+     * Use this for dropdowns and lists that don't need real-time data
+     */
+    getAllDepartmentsCached(): Observable<any> {
+        this.createAuthenticationHeaders();
+        const url = `${this.cs.domain}/department/getAllDepartmentNoPagination`;
+
+        return this.cacheService.getOrFetch(
+            'departments:all',
+            this.http.get(url, { headers: this.options }).pipe(
+                catchError((error: HttpErrorResponse) => {
+                    return throwError(() => error);
+                })
+            )
+        );
+    }
+
+    /**
+     * Get departments with pagination
+     * Use this for tables with large datasets
+     */
+    getDepartmentsPaginated(params: PaginationParams = {}): Observable<PaginatedResponse<any>> {
+        this.createAuthenticationHeaders();
+        const { page = 1, limit = 20 } = params;
+        const url = `${this.cs.domain}/department/getAllDepartment?page=${page}&limit=${limit}`;
+
+        return this.http.get<PaginatedResponse<any>>(url, { headers: this.options }).pipe(
+            catchError((error: HttpErrorResponse) => {
+                return throwError(() => error);
+            })
+        );
+    }
+
+    /**
+     * Invalidate department cache (call after add/update/delete)
+     */
+    invalidateCache(): void {
+        this.cacheService.invalidateByPrefix('departments');
+    }
 }
+

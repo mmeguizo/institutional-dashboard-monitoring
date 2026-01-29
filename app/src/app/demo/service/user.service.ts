@@ -10,6 +10,31 @@ import { MessageService } from 'primeng/api';
 import { catchError } from 'rxjs/operators';
 import { BaseService } from './base.service';
 import { Observable, throwError } from 'rxjs';
+import { CacheService } from './cache.service';
+
+/** Pagination parameters interface */
+export interface UserPaginationParams {
+    page?: number;
+    limit?: number;
+    role?: string;
+    search?: string;
+}
+
+/** Paginated response interface */
+export interface PaginatedUserResponse<T> {
+    success: boolean;
+    data?: T[];
+    users?: T[];
+    pagination?: {
+        currentPage: number;
+        totalPages: number;
+        totalCount: number;
+        limit: number;
+        hasNextPage: boolean;
+        hasPrevPage: boolean;
+    };
+    message?: string;
+}
 
 @Injectable({
     providedIn: 'root',
@@ -23,7 +48,8 @@ export class UserService extends BaseService {
         protected override http: HttpClient,
         protected override messageService: MessageService,
         protected override auth: AuthService,
-        protected override cs: ConnectionService
+        protected override cs: ConnectionService,
+        private cacheService: CacheService
     ) {
         super(http, messageService, auth, cs);
     }
@@ -152,6 +178,48 @@ export class UserService extends BaseService {
                     return throwError(() => error);
                 })
             );
+    }
+
+    /**
+     * Get all users with caching (5 min TTL)
+     */
+    getAllUsersCached(): Observable<any> {
+        this.createAuthenticationHeaders();
+        return this.cacheService.getOrFetch(
+            'users:all',
+            this.http.get(this.cs.domain + '/users/getAllUser', {
+                headers: this.options,
+            }).pipe(
+                catchError((error: HttpErrorResponse) => {
+                    return throwError(() => error);
+                })
+            ),
+            5 * 60 * 1000 // 5 minutes TTL
+        );
+    }
+
+    /**
+     * Get users with pagination
+     */
+    getUsersPaginated(params: UserPaginationParams = {}): Observable<PaginatedUserResponse<any>> {
+        this.createAuthenticationHeaders();
+        const { page = 1, limit = 20, role, search } = params;
+        let url = `${this.cs.domain}/users/getAllUser?page=${page}&limit=${limit}`;
+        if (role) url += `&role=${role}`;
+        if (search) url += `&search=${encodeURIComponent(search)}`;
+
+        return this.http.get<PaginatedUserResponse<any>>(url, { headers: this.options }).pipe(
+            catchError((error: HttpErrorResponse) => {
+                return throwError(() => error);
+            })
+        );
+    }
+
+    /**
+     * Invalidate users cache (call after add/update/delete)
+     */
+    invalidateCache(): void {
+        this.cacheService.invalidateByPrefix('users');
     }
 
     getUserProfilePic(data) {

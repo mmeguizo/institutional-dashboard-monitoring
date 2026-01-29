@@ -43,7 +43,8 @@ import { customTitleCase } from 'src/app/utlis/custom-title-case';
     styleUrl: './objective-table.component.scss',
 })
 export class ObjectiveTableComponent implements OnInit, OnDestroy {
-    private objectiveTableSubscription = new Subject<void>();
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
     @Input() getObjective = new EventEmitter<any>();
     @Input() editObjective = new EventEmitter<any>();
     @Input() addNewSuccessObjective = new EventEmitter<any>();
@@ -89,9 +90,8 @@ export class ObjectiveTableComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        this.objectiveTableSubscription.next();
-        this.objectiveTableSubscription.complete();
-        this.objectiveTableSubscription.unsubscribe();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     hideViewObjectiveTable(id?: string) {
@@ -163,7 +163,7 @@ export class ObjectiveTableComponent implements OnInit, OnDestroy {
             this.loading = true;
             this.objective
                 .fetch('get', 'objectives', `getAllByIdObjectives/${id}`)
-                .pipe(takeUntil(this.objectiveTableSubscription))
+                .pipe(takeUntil(this.destroy$))
                 .subscribe(async (data: any) => {
                     this.objectiveDatas = await data.Objectives;
                     this.changeDetectorRef.markForCheck();
@@ -194,7 +194,7 @@ export class ObjectiveTableComponent implements OnInit, OnDestroy {
                     .fetch('put', 'objectives', 'setInactiveObjectives', {
                         id: id,
                     })
-                    .pipe(takeUntil(this.objectiveTableSubscription))
+                    .pipe(takeUntil(this.destroy$))
                     .subscribe((data: any) => {
                         if (data.success) {
                             //tag is as changes so if close will recalculate the data

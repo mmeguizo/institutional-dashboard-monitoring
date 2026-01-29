@@ -19,7 +19,8 @@ import { getFrequencyKeys, getIcon } from 'src/app/utlis/file-utils';
 })
 export class ViewFilesComponent implements OnInit, OnDestroy {
     @Input() viewFiles: string;
-    private viewFilesSubscription = new Subject<void>();
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
 
     viewObjectiveFileDialogCard: Boolean = false;
     AllObjectivesFiles: any[] = [];
@@ -62,7 +63,7 @@ export class ViewFilesComponent implements OnInit, OnDestroy {
             this.loading = true;
             this.file
                 .getAllFilesFromObjective(id, objectiveID)
-                .pipe(takeUntil(this.viewFilesSubscription))
+                .pipe(takeUntil(this.destroy$))
                 .subscribe((data: any) => {
                     this.AllObjectivesFiles = data.data;
                     this.loading = false;
@@ -96,7 +97,7 @@ export class ViewFilesComponent implements OnInit, OnDestroy {
                         id: id,
                         source: source,
                     })
-                    .pipe(takeUntil(this.viewFilesSubscription))
+                    .pipe(takeUntil(this.destroy$))
                     .subscribe((data: any) => {
                         if (data.success) {
                             this.getAllFilesFromObjectiveLoad(

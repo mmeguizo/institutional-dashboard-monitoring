@@ -21,6 +21,12 @@ const logs = new Schema(
   }
 );
 
+// Performance indexes for high-traffic queries
+logs.index({ date: -1 }); // For sorting by date
+logs.index({ user: 1, date: -1 }); // For user activity lookups
+logs.index({ url: 1, date: -1 }); // For URL-based analytics
+logs.index({ deleted: 1 }); // For filtering deleted logs
+
 module.exports = mongoose.model("Logs", logs);
 
 /*

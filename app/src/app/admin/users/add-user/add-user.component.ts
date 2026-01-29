@@ -42,7 +42,8 @@ export class AddUserComponent implements OnInit, OnDestroy {
     roleOptions = ROLE_OPTIONS;
 
     addnewUserEventFromParent: any;
-    private getUserSubscription = new Subject<void>();
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
     // public  FormGroup;
     Addform: FormGroup;
     formGroupCampus: FormGroup;
@@ -139,7 +140,7 @@ export class AddUserComponent implements OnInit, OnDestroy {
     getAllVicePresident() {
         this.user
             .fetch('get', 'users', 'getAllVicePresident')
-            .pipe(takeUntil(this.getUserSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.selectVPDropdown = data.data[0] || [];
             });
@@ -147,7 +148,7 @@ export class AddUserComponent implements OnInit, OnDestroy {
     getAllDirectors() {
         this.user
             .fetch('get', 'users', 'getAllDirector')
-            .pipe(takeUntil(this.getUserSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.selectDirectorDropdown = data.data[0] || [];
             });
@@ -156,7 +157,7 @@ export class AddUserComponent implements OnInit, OnDestroy {
     getAllCampuses() {
         this.camp
             .fetch('get', 'campus', 'getAllCampus')
-            .pipe(takeUntil(this.getUserSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.deptDropdownCampusValue = data.data[0];
             });
@@ -164,7 +165,7 @@ export class AddUserComponent implements OnInit, OnDestroy {
     getAllDepartmentDropdown() {
         this.camp
             .fetch('get', 'department', 'getAllDepartmentDropdown')
-            .pipe(takeUntil(this.getUserSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.deptDropdownValue = data.data[0];
             });
@@ -222,7 +223,7 @@ export class AddUserComponent implements OnInit, OnDestroy {
         console.log({ addUserFunction: data });
         this.user
             .fetch('post', 'users', 'addUser', data)
-            .pipe(takeUntil(this.getUserSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 if (data.success) {
                     // this.getAllusers();
@@ -273,7 +274,7 @@ export class AddUserComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.getUserSubscription.next();
-        this.getUserSubscription.complete();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 }

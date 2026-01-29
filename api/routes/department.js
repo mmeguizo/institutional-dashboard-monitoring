@@ -3,6 +3,7 @@ const { v4: uuidv4 } = require("uuid");
 const mongoose = require("mongoose");
 const { logger } = require("../middleware/logger");
 const User = require("../models/user"); // Import User Model Schema
+const { parsePaginationParams, executePaginatedFind } = require("../utils/pagination");
 
 module.exports = (router) => {
   router.get(
@@ -70,69 +71,86 @@ module.exports = (router) => {
     }
   );
 
-  router.get("/getAllDepartment", (req, res) => {
-    Department.find(
-      { deleted: false },
-      {
+  router.get("/getAllDepartment", async (req, res) => {
+    try {
+      const paginationParams = parsePaginationParams(req.query);
+      const filter = { deleted: false };
+      const projection = {
         id: 1,
         department: 1,
         status: 1,
         deleted: 1,
         department_head: 1,
         user_id: 1,
-      },
-      (err, department) => {
-        if (err) {
-          res.json({ success: false, message: err });
-        } else {
-          if (!department || department.length === 0) {
-            res.json({
-              success: false,
-              message: "No Department found.",
-              department: [],
-            });
-          } else {
-            res.json({ success: true, departments: department });
-          }
-        }
+      };
+      
+      const { data, pagination } = await executePaginatedFind(
+        Department,
+        filter,
+        projection,
+        paginationParams,
+        { sort: { _id: -1 } }
+      );
+      
+      if (!data || data.length === 0) {
+        return res.json({
+          success: false,
+          message: "No Department found.",
+          departments: [],
+          pagination,
+        });
       }
-    ).sort({ _id: -1 });
+      
+      res.json({ success: true, departments: data, pagination });
+    } catch (err) {
+      res.json({ success: false, message: err.message });
+    }
+  });
 
-    let params = JSON.stringify(req.params);
-    let query = JSON.stringify(req.query);
-    let body = JSON.stringify(req.body);
-    // logger.info(
-    //   ` ${req.method}|${params}|${query}|${req.originalUrl}|${body}|${
-    //     req.statusCode
-    //   }|${req.socket.remoteAddress}|${Date.now()}`
-    // );
+  // Legacy endpoint without pagination (for backward compatibility)
+  router.get("/getAllDepartmentNoPagination", async (req, res) => {
+    try {
+      const departments = await Department.find(
+        { deleted: false },
+        {
+          id: 1,
+          department: 1,
+          status: 1,
+          deleted: 1,
+          department_head: 1,
+          user_id: 1,
+        }
+      ).sort({ _id: -1 }).lean();
+      
+      if (!departments || departments.length === 0) {
+        return res.json({
+          success: false,
+          message: "No Department found.",
+          departments: [],
+        });
+      }
+      
+      res.json({ success: true, departments });
+    } catch (err) {
+      res.json({ success: false, message: err.message });
+    }
   });
 
   router.post("/findDepartmentById", async (req, res) => {
-    Department.findOne(
-      { id: req.body.id },
-      "-deleted -__v",
-      function (err, department) {
-        if (err) {
-          res.json({ success: false, message: "Department not found" });
-        } else {
-          if (!department) {
-            res.json({ success: false, message: "No Department found." });
-          } else {
-            res.json({ success: true, department: department });
-          }
-        }
+    try {
+      const department = await Department.findOne(
+        { id: req.body.id },
+        "-deleted -__v"
+      );
+      
+      if (!department) {
+        return res.json({ success: false, message: "No Department found." });
       }
-    );
-
-    let params = JSON.stringify(req.params);
-    let query = JSON.stringify(req.query);
-    let body = JSON.stringify(req.body);
-    // logger.info(
-    //   ` ${req.method}|${params}|${query}|${req.originalUrl}|${body}|${
-    //     req.statusCode
-    //   }|${req.socket.remoteAddress}|${Date.now()}`
-    // );
+      
+      res.json({ success: true, department: department });
+    } catch (err) {
+      res.json({ success: false, message: err.message });
+    }
   });
 
   // router.post("/addDepartment", async (req, res) => {

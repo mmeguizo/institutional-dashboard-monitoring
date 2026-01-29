@@ -23,5 +23,10 @@ const goallistsSchema = new Schema(
   { timestamps: true }
 );
 
+// Performance indexes for high-traffic queries
+goallistsSchema.index({ deleted: 1 }); // For filtering active goal lists
+goallistsSchema.index({ createdBy: 1, deleted: 1 }); // For creator-based queries
+goallistsSchema.index({ createdAt: -1 }); // For sorting by creation date
+
 // Export the Goals model
 module.exports = mongoose.model("Goallists", goallistsSchema);

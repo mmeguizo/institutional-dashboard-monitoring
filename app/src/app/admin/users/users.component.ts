@@ -50,7 +50,8 @@ export class UsersComponent implements OnInit, OnDestroy {
     updateUserId: string;
     public form: any;
     public Addform: any;
-    private getUserSubscription = new Subject<void>();
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
 
     roles = [
         { name: 'admin', code: 'admin' },
@@ -126,7 +127,7 @@ export class UsersComponent implements OnInit, OnDestroy {
     getAllCampuses() {
         this.camp
             .fetch('get', 'campus', 'getAllCampus')
-            .pipe(takeUntil(this.getUserSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.deptDropdownCampusValue = data.data[0];
             });
@@ -134,7 +135,7 @@ export class UsersComponent implements OnInit, OnDestroy {
     getAllDepartmentDropdown() {
         this.camp
             .fetch('get', 'department', 'getAllDepartmentDropdown')
-            .pipe(takeUntil(this.getUserSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.deptDropdownValue = data.data[0];
             });
@@ -148,7 +149,7 @@ export class UsersComponent implements OnInit, OnDestroy {
                 'users',
                 `getAllUsersExceptLoggedIn/${this.auth.getTokenUserID()}`
             )
-            .pipe(takeUntil(this.getUserSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 console.log({ getAllusers: data });
                 this.users = data.users;
@@ -158,7 +159,8 @@ export class UsersComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         // Do not forget to unsubscribe the event
-        this.getUserSubscription.unsubscribe();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     onGlobalFilter(table: Table, event: Event) {
@@ -188,7 +190,7 @@ export class UsersComponent implements OnInit, OnDestroy {
 
         this.user
             .fetch('put', 'users', 'updateUser', data)
-            .pipe(takeUntil(this.getUserSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 if (data.success) {
                     this.getAllusers();
@@ -217,7 +219,7 @@ export class UsersComponent implements OnInit, OnDestroy {
             .fetch('put', 'users', 'setInactiveUser', {
                 id: this.deleteUserId,
             })
-            .pipe(takeUntil(this.getUserSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 if (data.success) {
                     this.getAllusers();
@@ -247,7 +249,7 @@ export class UsersComponent implements OnInit, OnDestroy {
             .fetch('put', 'users', 'changeUserStatus', {
                 id: this.changeStatusId,
             })
-            .pipe(takeUntil(this.getUserSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 if (data.success) {
                     this.getAllusers();
@@ -271,7 +273,7 @@ export class UsersComponent implements OnInit, OnDestroy {
     getAllDepartments() {
         this.dept
             .getRoute('get', 'department', 'getAllDepartment')
-            .pipe(takeUntil(this.getUserSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.AllDepartments = data.department;
             });

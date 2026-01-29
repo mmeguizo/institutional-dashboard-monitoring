@@ -28,7 +28,8 @@ export class AddFilesComponent implements OnInit, OnDestroy {
     @Input() addNewFile: string;
     @Output() childAddFile = new EventEmitter<object>();
 
-    private getAddFilesComponentSubscription = new Subject<void>();
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
     addFileTrigger: any;
 
     uploadedFiles: any[] = [];
@@ -66,8 +67,8 @@ export class AddFilesComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        this.getAddFilesComponentSubscription.next();
-        this.getAddFilesComponentSubscription.complete();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     createaddFileForm() {
@@ -99,7 +100,7 @@ export class AddFilesComponent implements OnInit, OnDestroy {
                     ? this.frequencyFileName
                     : '',
             })
-            .pipe(takeUntil(this.getAddFilesComponentSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: (data: any) => {
                     this.childAddFile.emit({

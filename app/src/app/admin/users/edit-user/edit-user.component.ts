@@ -41,7 +41,8 @@ export class EditUserComponent implements OnInit, OnDestroy {
     formGroupDemo: FormGroup;
     formGroupCampus: FormGroup;
     editNewUserEventFromParent: any;
-    private getUserSubscription = new Subject<void>();
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
     selectedDept: string;
     selectedRole: string;
     updateUserId: string;
@@ -221,7 +222,7 @@ export class EditUserComponent implements OnInit, OnDestroy {
     getAllVicePresident() {
         this.user
             .fetch('get', 'users', 'getAllVicePresident')
-            .pipe(takeUntil(this.getUserSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.selectVP = data.data[0] || [];
             });
@@ -230,7 +231,7 @@ export class EditUserComponent implements OnInit, OnDestroy {
     getAllDirectors() {
         this.user
             .fetch('get', 'users', 'getAllDirector')
-            .pipe(takeUntil(this.getUserSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.selectDiretor = data.data[0] || [];
                 console.log({ getAllDirectors: this.selectDiretor });
@@ -240,7 +241,7 @@ export class EditUserComponent implements OnInit, OnDestroy {
     getAllCampuses() {
         this.camp
             .fetch('get', 'campus', 'getAllCampus')
-            .pipe(takeUntil(this.getUserSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.deptDropdownCampusValue = data.data[0];
             });
@@ -248,14 +249,14 @@ export class EditUserComponent implements OnInit, OnDestroy {
     getAllDepartmentDropdown() {
         this.camp
             .fetch('get', 'department', 'getAllDepartmentDropdown')
-            .pipe(takeUntil(this.getUserSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.deptDropdownValue = data.data[0];
             });
     }
     ngOnDestroy(): void {
-        this.getUserSubscription.next();
-        this.getUserSubscription.complete();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     updateUserExecution(form: FormGroup): void {
@@ -299,7 +300,7 @@ export class EditUserComponent implements OnInit, OnDestroy {
         console.log({ updateUserExecution: data });
         this.user
             .fetch('put', 'users', 'updateUserAdmin', data)
-            .pipe(takeUntil(this.getUserSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 if (data.success) {
                     this.childEditUserEvent.emit({

@@ -179,4 +179,12 @@ const objectivesSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Performance indexes for high-traffic queries
+objectivesSchema.index({ deleted: 1, userId: 1 }); // Compound index for user objectives
+objectivesSchema.index({ goalId: 1, deleted: 1 }); // For goal-based lookups (string id)
+objectivesSchema.index({ goal_Id: 1, deleted: 1 }); // For goal-based lookups (ObjectId)
+objectivesSchema.index({ createdBy: 1, deleted: 1 }); // For creator-based queries
+objectivesSchema.index({ complete: 1, deleted: 1 }); // For completion status filtering
+objectivesSchema.index({ createdAt: -1 }); // For sorting by creation date
+
 module.exports = mongoose.model("Objective", objectivesSchema);

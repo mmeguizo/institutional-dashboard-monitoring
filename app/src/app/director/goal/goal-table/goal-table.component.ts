@@ -19,7 +19,8 @@ import { DepartmentService } from 'src/app/demo/service/department.service';
     styleUrl: './goal-table.component.scss',
 })
 export class GoalTableComponent implements OnInit, OnDestroy {
-    private getGoalTableSubscription = new Subject<void>();
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
     @Input() editObjective = new EventEmitter<any>();
     @Input() addedaGoal = new EventEmitter<any>();
     @Input() editedAGoal = new EventEmitter<any>();
@@ -71,7 +72,8 @@ export class GoalTableComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        this.getGoalTableSubscription.unsubscribe();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     goalsTableData(userId?: string) {
@@ -84,7 +86,7 @@ export class GoalTableComponent implements OnInit, OnDestroy {
                 `getAllObjectivesUnderADirector/${userId}`
             )
             .pipe(
-                takeUntil(this.getGoalTableSubscription),
+                takeUntil(this.destroy$),
                 tap((data: any) => {
                     this.goals = data.goals;
                     this.deptDropdownValue = data?.dropdown;
@@ -131,7 +133,7 @@ export class GoalTableComponent implements OnInit, OnDestroy {
             accept: () => {
                 this.goal
                     .fetch('put', 'goals', 'deleteGoals', { _id: _id })
-                    .pipe(takeUntil(this.getGoalTableSubscription))
+                    .pipe(takeUntil(this.destroy$))
                     .subscribe((data: any) => {
                         if (data.success) {
                             this.messageService.add({
@@ -173,7 +175,7 @@ export class GoalTableComponent implements OnInit, OnDestroy {
     getAllDept() {
         this.dept
             .getRoute('get', 'department', 'getAllDepartmentDropdown')
-            .pipe(takeUntil(this.getGoalTableSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.deptDropdownValue = data?.data[0];
             });

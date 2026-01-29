@@ -1,14 +1,22 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
+const compression = require("compression");
+const rateLimit = require("express-rate-limit");
 const app = express();
 const router = express.Router();
 const config = require("./config/database");
 const mongoose = require("mongoose");
 const PORT = process.env.PORT || 3002;
 const path = require("path");
+const { initRedis } = require("./utils/cache");
 const office_head_query = require("./routes/office_head_query");
 const http = require("http").Server(app);
+
+// Initialize Redis cache (only if REDIS_ENABLED=true in .env)
+initRedis();
+
 //path routes
 //onst customer = require('./routes/customers')(router);
 const authentication = require("./routes/authentication")(router);
@@ -40,6 +48,36 @@ mongoose.connect(config.uri, config.options, (err) => {
     console.log("on port " + PORT);
   }
 });
+
+// Security middleware
+app.use(helmet({
+  contentSecurityPolicy: false, // Disable CSP for API
+  crossOriginEmbedderPolicy: false,
+}));
+
+// Compression for response bodies
+app.use(compression());
+
+// Rate limiting - protect against DDoS and brute force attacks
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 1000, // 1000 requests per 15 minutes
+  message: { success: false, message: "Too many requests, please try again later." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Stricter rate limit for authentication endpoints
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20, // 20 login attempts per 15 minutes
+  message: { success: false, message: "Too many login attempts, please try again later." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use(generalLimiter);
+app.use("/authentication", authLimiter);
 
 app.use(cors());
 // app.use(logMiddleware);

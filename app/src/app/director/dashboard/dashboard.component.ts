@@ -61,7 +61,8 @@ import { customTitleCase } from 'src/app/utlis/custom-title-case';
 export class DashboardComponent implements OnInit, OnDestroy {
     COLORS = ['#f06292', '#ba68c8', '#4dd0e1', '#aed581', '#ffca28'];
     calendarVisible = signal(true);
-    private objectiveSubscription = new Subject<void>();
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
 
     currentEvents = signal<EventApi[]>([]);
     loading = true;
@@ -125,7 +126,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 'director_query',
                 `getAllObjectivesUnderADirectorV2/${this.userId}`
             )
-            .pipe(takeUntil(this.objectiveSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 console.log({ getAllObjectivesUnderADirector: data });
 
@@ -575,7 +576,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.objectiveSubscription.unsubscribe();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 }
 

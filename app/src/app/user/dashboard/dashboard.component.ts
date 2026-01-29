@@ -12,7 +12,8 @@ import { ObjectiveService } from 'src/app/demo/service/objective.service';
 export class DashboardComponent implements OnInit, OnDestroy {
     users: any;
     goals: any;
-    private getDashboardSubscription = new Subject<void>();
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
 
     objectivePieData: any;
     objectiveDoughnutData: any;
@@ -38,13 +39,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.getObjectiveViewPieChart();
     }
     ngOnDestroy() {
-        this.getDashboardSubscription.unsubscribe();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     getAllGoals() {
         this.goalService
             .fetch('get', 'goals', `getGoalsForUserDashboard/${this.userId}`)
-            .pipe(takeUntil(this.getDashboardSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.goals = data.data[0];
             });
@@ -57,7 +59,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 'objectives',
                 `getAllObjectivesForDashboard/${this.userId}`
             )
-            .pipe(takeUntil(this.getDashboardSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.objectivesData = data.data[0];
                 this.initChartsDoughnut({
@@ -70,7 +72,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     getObjectiveViewPieChart() {
         this.goalService
             .fetch('get', 'goals', `getObjectivesViewTable/${this.userId}`)
-            .pipe(takeUntil(this.getDashboardSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data?: any) => {
                 this.initBarCharts(data?.data || []);
             });

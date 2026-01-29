@@ -30,5 +30,13 @@ const goalsSchema = new Schema(
   { timestamps: true }
 );
 
+// Performance indexes for high-traffic queries
+goalsSchema.index({ deleted: 1, createdBy: 1 }); // Compound index for filtering goals by creator
+goalsSchema.index({ deleted: 1, department: 1 }); // For department-based queries
+goalsSchema.index({ deleted: 1, campus: 1 }); // For campus-based queries
+goalsSchema.index({ goallistsId: 1, deleted: 1 }); // For goal list lookups
+goalsSchema.index({ createdAt: -1 }); // For sorting by creation date
+goalsSchema.index({ complete: 1, deleted: 1 }); // For filtering complete/incomplete goals
+
 // Export the Goals model
 module.exports = mongoose.model("Goals", goalsSchema);

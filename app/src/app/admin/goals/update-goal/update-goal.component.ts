@@ -35,7 +35,8 @@ export class UpdateGoalComponent implements OnInit, OnDestroy {
 
     @Output() childEditGoalEvent = new EventEmitter<object>();
 
-    private updateGoalSubscription = new Subject<void>();
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
 
     updateGoalDialogCard: boolean = false;
     updateGoalform: FormGroup;
@@ -71,8 +72,8 @@ export class UpdateGoalComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {}
     ngOnDestroy(): void {
-        this.updateGoalSubscription.next();
-        this.updateGoalSubscription.complete();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     ngOnChanges(changes: SimpleChanges) {
@@ -114,7 +115,7 @@ export class UpdateGoalComponent implements OnInit, OnDestroy {
     getAllDept() {
         this.dept
             .getRoute('get', 'department', 'getAllDepartmentDropdown')
-            .pipe(takeUntil(this.updateGoalSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.deptDropdownValue = data?.data[0];
             });
@@ -123,7 +124,7 @@ export class UpdateGoalComponent implements OnInit, OnDestroy {
     getAllCampuses() {
         this.campus
             .fetch('get', 'campus', 'getAllCampus')
-            .pipe(takeUntil(this.updateGoalSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.deptDropdownCampusValue = data.data[0];
             });
@@ -141,7 +142,7 @@ export class UpdateGoalComponent implements OnInit, OnDestroy {
         };
         this.goal
             .fetch('put', 'goals', 'updateGoals', data)
-            .pipe(takeUntil(this.updateGoalSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 if (data.success) {
                     // this.getAllObjectivesWithObjectives();

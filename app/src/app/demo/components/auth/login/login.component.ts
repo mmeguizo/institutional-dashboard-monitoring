@@ -22,7 +22,8 @@ import { MessageService } from 'primeng/api';
 })
 export class LoginComponent implements OnDestroy {
     valCheck: string[] = ['remember'];
-    private getSubscription = new Subject<void>();
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
 
     password!: string;
     email!: string;
@@ -39,7 +40,7 @@ export class LoginComponent implements OnDestroy {
                 email: this.email,
                 password: this.password,
             })
-            .pipe(takeUntil(this.getSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 if (data.success) {
                     let decoded = this.auth.decoded(data.token);
@@ -55,6 +56,7 @@ export class LoginComponent implements OnDestroy {
     }
 
     ngOnDestroy() {
-        this.getSubscription.unsubscribe();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 }

@@ -33,7 +33,8 @@ import { validateFileType, getIcon } from 'src/app/utlis/file-utils';
     styleUrl: './goals.component.scss',
 })
 export class GoalsComponent implements OnInit, OnDestroy {
-    private getGoalSubscription = new Subject<void>();
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
     @ViewChild('filter') filter!: ElementRef;
 
     userCampus: string;
@@ -185,7 +186,8 @@ export class GoalsComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         // Do not forget to unsubscribe the event
-        this.getGoalSubscription.unsubscribe();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     createAddGoalForm() {
@@ -231,7 +233,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
     getAllCampuses() {
         this.camp
             .fetch('get', 'campus', 'getAllCampus')
-            .pipe(takeUntil(this.getGoalSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.deptDropdownCampusValue = data.data[0];
             });
@@ -244,7 +246,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
                 'goals',
                 'getAllObjectivesWithObjectives/' + this.USERID
             )
-            .pipe(takeUntil(this.getGoalSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 // this.ObjectivesGoals = data.goals;
 
@@ -255,7 +257,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
     getAllDept() {
         this.dept
             .getRoute('get', 'department', 'getAllDepartmentDropdown')
-            .pipe(takeUntil(this.getGoalSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.deptDropdownValue = data.data[0];
             });
@@ -291,7 +293,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
             this.loading = true;
             this.obj
                 .fetch('get', 'objectives', `getAllByIdObjectives/${id}`)
-                .pipe(takeUntil(this.getGoalSubscription))
+                .pipe(takeUntil(this.destroy$))
                 .subscribe((data: any) => {
                     this.objectiveDatas = data.Objectives;
                     //initialize completion button
@@ -317,7 +319,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
                     'objectives',
                     `getAllByIdObjectives/${id}/${this.USERID}`
                 )
-                .pipe(takeUntil(this.getGoalSubscription))
+                .pipe(takeUntil(this.destroy$))
                 .subscribe((data: any) => {
                     this.objectiveDatas = data.Objectives;
                     let subBudget = data.Objectives.reduce((acc, e) => {
@@ -347,7 +349,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
         this.loading = true;
         this.fileService
             .getAllFilesFromObjective(id, objectiveID)
-            .pipe(takeUntil(this.getGoalSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.AllObjectivesFiles = data.data;
                 this.loading = false;
@@ -361,7 +363,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
         this.loading = true;
         this.fileService
             .getAllFilesHistoryFromObjectiveLoad(id, objectiveID)
-            .pipe(takeUntil(this.getGoalSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.AllObjectivesHistoryFiles = data.data;
                 this.loading = false;
@@ -396,7 +398,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
 
         this.goal
             .fetch('post', 'goals', 'addGoals', data)
-            .pipe(takeUntil(this.getGoalSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 if (data.success) {
                     this.getAllObjectivesWithObjectives();
@@ -426,7 +428,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
         e.value.createdBy = this.USERID;
         this.obj
             .fetch('post', 'objectives', 'addObjectives', e.value)
-            .pipe(takeUntil(this.getGoalSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 if (data.success) {
                     this.addObjectiveGoalDialogCard = false;
@@ -465,7 +467,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
         };
         this.goal
             .fetch('put', 'goals', 'updateGoals', data)
-            .pipe(takeUntil(this.getGoalSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 if (data.success) {
                     this.getAllObjectivesWithObjectives();
@@ -578,7 +580,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
                     .fetch('put', 'objectives', 'updateobjectivecompletion', {
                         id: data.id,
                     })
-                    .pipe(takeUntil(this.getGoalSubscription))
+                    .pipe(takeUntil(this.destroy$))
                     .subscribe(async (results: any) => {
                         if (results.success) {
                             this.getAllObjectivesWithObjectives();
@@ -622,7 +624,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
             this.formGroupDropdown.value.selectedDropdown.name;
         this.obj
             .fetch('put', 'objectives', 'updateObjectives', form.value)
-            .pipe(takeUntil(this.getGoalSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 if (data.success) {
                     //close the objective table
@@ -656,7 +658,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
             accept: () => {
                 this.goal
                     .fetch('put', 'goals', 'deleteGoals', { _id: _id })
-                    .pipe(takeUntil(this.getGoalSubscription))
+                    .pipe(takeUntil(this.destroy$))
                     .subscribe((data: any) => {
                         if (data.success) {
                             this.getAllObjectivesWithObjectives();
@@ -691,7 +693,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
                     .fetch('put', 'objectives', 'setInactiveObjectives', {
                         id: id,
                     })
-                    .pipe(takeUntil(this.getGoalSubscription))
+                    .pipe(takeUntil(this.destroy$))
                     .subscribe((data: any) => {
                         if (data.success) {
                             this.getObjectives(goalId);
@@ -725,7 +727,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
                         id: id,
                         source: source,
                     })
-                    .pipe(takeUntil(this.getGoalSubscription))
+                    .pipe(takeUntil(this.destroy$))
                     .subscribe((data: any) => {
                         if (data.success) {
                             this.getAllFilesFromObjectiveLoad(
@@ -785,7 +787,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
                 this.objectiveIDforFile,
                 this.uploadedFiles
             )
-            .pipe(takeUntil(this.getGoalSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 // after adding files it did not add the new files just reload, clear the data to fix the issue
                 this.AllObjectivesFiles = [];
@@ -823,7 +825,7 @@ export class GoalsComponent implements OnInit, OnDestroy {
     hidviewObjectRefetch(id) {
         this.obj
             .fetch('get', 'objectives', `getAllByIdObjectives/${id}`)
-            .pipe(takeUntil(this.getGoalSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 this.objectiveDatas = data.Objectives;
                 // remove the data

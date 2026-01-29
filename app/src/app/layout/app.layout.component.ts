@@ -1,6 +1,6 @@
 import { Component, OnDestroy, Renderer2, ViewChild } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
-import { filter, Subscription } from 'rxjs';
+import { filter, Subject, Subscription } from 'rxjs';
 import { LayoutService } from './service/app.layout.service';
 import { AppSidebarComponent } from './app.sidebar.component';
 import { AppTopBarComponent } from './app.topbar.component';
@@ -16,6 +16,9 @@ import { AppTopBarComponent } from './app.topbar.component';
     `,
 })
 export class AppLayoutComponent implements OnDestroy {
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
+
     overlayMenuOpenSubscription: Subscription;
 
     menuOutsideClickListener: any;
@@ -166,7 +169,8 @@ export class AppLayoutComponent implements OnDestroy {
 
     ngOnDestroy() {
         if (this.overlayMenuOpenSubscription) {
-            this.overlayMenuOpenSubscription.unsubscribe();
+            this.destroy$.next();
+        this.destroy$.complete();
         }
 
         if (this.menuOutsideClickListener) {

@@ -49,7 +49,8 @@ export class AddObjectiveComponent implements OnInit, OnDestroy {
     dropdwonSelection: { name: string; code: string }[];
     dropdwonGoallistSelection: { name: string; code: string }[];
     USERID: string;
-    private addObjectiveSubscription = new Subject<void>();
+    /** Subject for managing subscriptions - MUST call next() and complete() in ngOnDestroy */
+    private destroy$ = new Subject<void>();
     subObjectiveGoalID: string;
     goal_ObjectId: string;
     customFunctionalName: string;
@@ -141,8 +142,8 @@ export class AddObjectiveComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.addObjectiveSubscription.next();
-        this.addObjectiveSubscription.complete();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     async ngOnChanges(changes: SimpleChanges) {
@@ -168,7 +169,7 @@ export class AddObjectiveComponent implements OnInit, OnDestroy {
     getTheGoalData(goal: string) {
         this.goals
             .fetch('get', 'goals', `getGoalForCreatingObjective/${goal}`)
-            .pipe(takeUntil(this.addObjectiveSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 if (data.success) {
                     this.addObjectiveGoalform.patchValue({
@@ -318,7 +319,7 @@ export class AddObjectiveComponent implements OnInit, OnDestroy {
     //             'goallists',
     //             `getAllAddObjectivesGoallistsDropdown/${id}`
     //         )
-    //         .pipe(takeUntil(this.addObjectiveSubscription))
+    //         .pipe(takeUntil(this.destroy$))
     //         .subscribe({
     //             next: (data: any) => {
     //                 this.dropdwonGoallistSelection = data.objectives;
@@ -376,7 +377,7 @@ export class AddObjectiveComponent implements OnInit, OnDestroy {
 
         this.obj
             .fetch('post', 'objectives', 'addObjectives', updatedData)
-            .pipe(takeUntil(this.addObjectiveSubscription))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((data: any) => {
                 if (data.success) {
                     this.addObjectiveGoalDialogCard = false;

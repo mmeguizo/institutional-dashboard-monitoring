@@ -9,7 +9,8 @@ import { ConnectionService } from './connection.service';
 import { AuthService } from './auth.service';
 import { MessageService } from 'primeng/api';
 import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
+import { throwError, Observable } from 'rxjs';
+import { CacheService } from './cache.service';
 
 @Injectable({
     providedIn: 'root',
@@ -23,7 +24,8 @@ export class GoallistService {
         public auth: AuthService,
         public cs: ConnectionService,
         private http: HttpClient,
-        private messageService: MessageService
+        private messageService: MessageService,
+        private cacheService: CacheService
     ) {}
 
     createAuthenticationHeaders() {
@@ -87,5 +89,30 @@ export class GoallistService {
                     return throwError(() => error);
                 })
             );
+    }
+
+    /**
+     * Get all goal lists with caching (10 min TTL)
+     */
+    getAllGoallistsCached(): Observable<any> {
+        this.createAuthenticationHeaders();
+        const url = `${this.cs.domain}/goallists/getAllGoalLists`;
+
+        return this.cacheService.getOrFetch(
+            'goallists:all',
+            this.http.get(url, { headers: this.options }).pipe(
+                catchError((error: HttpErrorResponse) => {
+                    return throwError(() => error);
+                })
+            ),
+            10 * 60 * 1000 // 10 minutes TTL
+        );
+    }
+
+    /**
+     * Invalidate goallists cache (call after add/update/delete)
+     */
+    invalidateCache(): void {
+        this.cacheService.invalidateByPrefix('goallists');
     }
 }
