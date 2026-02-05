@@ -1,15 +1,48 @@
-const User = require("../models/user");
+const prisma = require("../config/prisma");
 const jwt = require("jsonwebtoken");
 const config = require("../config/database");
 const { v4: uuidv4 } = require("uuid");
 let bcrypt = require("bcryptjs");
-const comparePassword = require("../models/validators/password-compare");
-// const { logger, logMiddleware } = require("../middleware/logger");
+
+// Helper function to compare passwords
+const comparePassword = async (inputPassword, hashedPassword) => {
+  return bcrypt.compare(inputPassword, hashedPassword);
+};
+
+// Helper function to hash password
+const hashPassword = async (password) => {
+  const salt = await bcrypt.genSalt(10);
+  return bcrypt.hash(password, salt);
+};
+
+// Map role string to enum
+const mapRoleToEnum = (role) => {
+  const roleMap = {
+    'admin': 'ADMIN',
+    'president': 'PRESIDENT',
+    'vice-president': 'VICE_PRESIDENT',
+    'director': 'DIRECTOR',
+    'office-head': 'OFFICE_HEAD'
+  };
+  return roleMap[role?.toLowerCase()] || 'OFFICE_HEAD';
+};
+
+// Map enum to role string (for JWT)
+const mapEnumToRole = (enumRole) => {
+  const roleMap = {
+    'ADMIN': 'admin',
+    'PRESIDENT': 'president',
+    'VICE_PRESIDENT': 'vice-president',
+    'DIRECTOR': 'director',
+    'OFFICE_HEAD': 'office-head'
+  };
+  return roleMap[enumRole] || 'office-head';
+};
 
 module.exports = (router) => {
   router.post("/register", async (req, res) => {
     try {
-      const { email, username, password, confirm } = req.body;
+      const { email, username, password, confirm, firstname, lastname, campus } = req.body;
       if (!email)
         return res.json({ success: false, message: "You must provide an email" });
       if (!username)
@@ -27,34 +60,44 @@ module.exports = (router) => {
       if (password !== confirm)
         return res.json({ success: false, message: "Password not match" });
 
-      const user = new User({
-        id: uuidv4(),
-        email: req.body.email.toLowerCase(),
-        username: req.body.username.toLowerCase(),
-        password: req.body.password,
-        role: "user",
+      // Validate password length
+      if (password.length < 8 || password.length > 35) {
+        return res.json({ success: false, message: "Password must be 8-35 characters" });
+      }
+
+      // Hash password
+      const hashedPassword = await hashPassword(password);
+
+      const user = await prisma.user.create({
+        data: {
+          visibleId: uuidv4(),
+          email: email.toLowerCase(),
+          username: username.toLowerCase(),
+          password: hashedPassword,
+          firstname: firstname || '',
+          lastname: lastname || '',
+          campus: campus || 'Talisay',
+          role: 'OFFICE_HEAD',
+        },
+        select: {
+          email: true,
+          username: true,
+        }
       });
 
-      const data = await user.save();
       res.json({
         success: true,
         message: "Account Registered successfully",
-        data: { email: data.email, username: data.username },
+        data: user,
       });
     } catch (err) {
-      if (err.code === 11000) {
+      // Handle unique constraint violations
+      if (err.code === 'P2002') {
+        const field = err.meta?.target?.[0] || 'field';
         return res.json({
           success: false,
-          message: "User name or Email already exists",
+          message: `${field.charAt(0).toUpperCase() + field.slice(1)} already exists`,
           err: err.message,
-        });
-      }
-      const errors = Object.keys(err.errors || {});
-      if (errors.length) {
-        const error = err.errors[errors[0]];
-        return res.json({
-          success: false,
-          message: error.message,
         });
       }
       res.json({
@@ -71,7 +114,9 @@ module.exports = (router) => {
         return res.json({ success: false, message: "Email not provided" });
       }
       
-      const email = await User.findOne({ email: req.params.email });
+      const email = await prisma.user.findUnique({ 
+        where: { email: req.params.email.toLowerCase() }
+      });
       if (email) {
         return res.json({ success: false, message: "Email already taken" });
       }
@@ -87,7 +132,9 @@ module.exports = (router) => {
         return res.json({ success: false, message: "Username not provided" });
       }
       
-      const username = await User.findOne({ username: req.params.username });
+      const username = await prisma.user.findUnique({ 
+        where: { username: req.params.username.toLowerCase() }
+      });
       if (username) {
         return res.json({ success: false, message: "Username already taken" });
       }
@@ -97,62 +144,75 @@ module.exports = (router) => {
     }
   });
 
-  // new login with network down response
+  // Login route using Prisma
   router.post("/login", async (req, res) => {
-    const { email, password } = req.body;
-    if (!email)
-      return res.json({ success: false, message: "No email was provided" });
-    if (!password)
-      return res.json({ success: false, message: "No password was provided" });
+    try {
+      const { email, password } = req.body;
+      if (!email)
+        return res.json({ success: false, message: "No email was provided" });
+      if (!password)
+        return res.json({ success: false, message: "No password was provided" });
 
-    User.findOne({ email: email.toLowerCase().trim() })
-      .then(async (user) => {
-        if (!user)
-          return res.json({ success: false, message: "User Not Found" });
-        if (user.status === "pending")
-          return res.json({ success: false, message: "Account Still Pending" });
-        if (user.status === "inactive")
-          return res.json({
-            success: false,
-            message: "Your account is inactive",
-          });
-        if (await comparePassword(req.body.password.trim(), user.password)) {
-          //remove _id andpassword from the entries
-          let newUser = user.toObject();
-          delete newUser.password;
-          delete newUser._id;
-          delete newUser.__v;
+      const user = await prisma.user.findUnique({
+        where: { email: email.toLowerCase().trim() }
+      });
 
-          const token = jwt.sign(newUser, config.secret, {
-            expiresIn: "24h",
-          });
-          let params = JSON.stringify(req.params);
-          let query = JSON.stringify(req.query);
-          let body = JSON.stringify(req.body);
-          // logger.info(
-          //   ` ${req.method}|${params}|${query}|${req.originalUrl}|${body}|${
-          //     req.statusCode
-          //   }|${req.socket.remoteAddress}|${Date.now()}`
-          // );
-          res.json({
-            success: true,
-            message: "Password is Correct",
-            token: token,
-          });
-        } else {
-          res.json({
-            success: false,
-            message: "Password is incorrect",
-          });
-        }
-      })
-      .catch((err) => {
-        // This will catch any network errors
+      if (!user)
+        return res.json({ success: false, message: "User Not Found" });
+      if (user.status === "pending")
+        return res.json({ success: false, message: "Account Still Pending" });
+      if (user.status === "inactive")
+        return res.json({
+          success: false,
+          message: "Your account is inactive",
+        });
+
+      const isPasswordValid = await comparePassword(password.trim(), user.password);
+      
+      if (isPasswordValid) {
+        // Create user object for JWT (exclude sensitive data)
+        const userForToken = {
+          id: user.visibleId,
+          email: user.email,
+          username: user.username,
+          firstname: user.firstname,
+          lastname: user.lastname,
+          campus: user.campus,
+          department: user.department,
+          role: mapEnumToRole(user.role),
+          status: user.status,
+          profile_pic: user.profilePic,
+          department_id: user.departmentId,
+          vice_president_id: user.vicePresidentId,
+          vice_president_name: user.vicePresidentName,
+          director_id: user.directorId,
+          director_name: user.directorName,
+          office_head_id: user.officeHeadId,
+          office_head_name: user.officeHeadName,
+        };
+
+        const token = jwt.sign(userForToken, config.secret, {
+          expiresIn: "24h",
+        });
+
+        res.json({
+          success: true,
+          message: "Password is Correct",
+          token: token,
+        });
+      } else {
         res.json({
           success: false,
-          message: "Unable to connect to the server. Please try again later.",
+          message: "Password is incorrect",
         });
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      res.json({
+        success: false,
+        message: "Unable to connect to the server. Please try again later.",
       });
+    }
   });
 
   /*
