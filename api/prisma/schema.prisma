@@ -330,7 +330,7 @@ model FileUpload {
   dateAdded       DateTime  @default(now()) @map("date_added")
   status          Boolean   @default(true)
   filetype        String?   @default("")
-  objectiveId     String    @map("objective_id")
+  objectiveId     String?   @map("objective_id")
   createdAt       DateTime  @default(now()) @map("created_at")
   updatedAt       DateTime  @updatedAt @map("updated_at")
 
@@ -364,7 +364,7 @@ model FileUpload {
 
   // Relations
   user            User      @relation(fields: [userId], references: [id])
-  objective       Objective @relation(fields: [objectiveId], references: [id], onDelete: Cascade)
+  objective       Objective? @relation(fields: [objectiveId], references: [id], onDelete: Cascade)
 
   @@index([userId, objectiveId])
   @@index([objectiveId, status])

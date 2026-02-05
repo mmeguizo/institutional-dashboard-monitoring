@@ -13,6 +13,9 @@ const http = require("http").Server(app);
 // Import Prisma client for database connection
 const prisma = require("./config/prisma");
 
+// Import auth middleware
+const verifyToken = require("./middleware/authMiddleware");
+
 // Initialize Redis cache (only if REDIS_ENABLED=true in .env)
 initRedis();
 
@@ -67,6 +70,7 @@ app.use(
   helmet({
     contentSecurityPolicy: false, // Disable CSP for API
     crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow cross-origin requests for static files (images, etc.)
   })
 );
 
@@ -124,23 +128,27 @@ app.use("/uploads", express.static(path.join(__dirname, "../uploads/files")));
 // ====================
 // API ROUTES
 // ====================
+// Public routes (no authentication required)
 app.use("/authentication", authentication);
-app.use("/users", users);
-app.use("/fileupload", file);
-app.use("/department", department);
-app.use("/objectives", objectives);
-app.use("/goals", goals);
-app.use("/campus", campus);
-app.use("/logs", log);
-app.use("/ai", ai);
-app.use("/userhistory", userhistory);
-app.use("/goallists", goallists);
-app.use("/director_query", director_query);
-app.use("/office_head_query", office_head_query);
-app.use("/vice_president_query", vice_president_query);
-app.use("/shared", shared_files);
-app.use("/remark", remarks);
-app.use("/notification", notifications);
+
+// Protected routes (authentication required)
+// Apply verifyToken middleware to all routes below
+app.use("/users", verifyToken, users);
+app.use("/fileupload", verifyToken, file);
+app.use("/department", verifyToken, department);
+app.use("/objectives", verifyToken, objectives);
+app.use("/goals", verifyToken, goals);
+app.use("/campus", verifyToken, campus);
+app.use("/logs", verifyToken, log);
+app.use("/ai", verifyToken, ai);
+app.use("/userhistory", verifyToken, userhistory);
+app.use("/goallists", verifyToken, goallists);
+app.use("/director_query", verifyToken, director_query);
+app.use("/office_head_query", verifyToken, office_head_query);
+app.use("/vice_president_query", verifyToken, vice_president_query);
+app.use("/shared", verifyToken, shared_files);
+app.use("/remark", verifyToken, remarks);
+app.use("/notification", verifyToken, notifications);
 app.use(
   "/profile_pic",
   express.static(path.join(__dirname, "../uploads/images"))

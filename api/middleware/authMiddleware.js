@@ -1,82 +1,52 @@
-// // const jwt = require("jsonwebtoken");
-// const config = require("../config/database");
+const jwt = require("jsonwebtoken");
+const config = require("../config/database");
 
-// // const verifyToken = (req, res, next) => {
-// //   //   const token = req.header("Authorization")?.split(" ")[1]; // Assuming token is in the Authorization header
-// //   const token = req.header("Authorization"); // Assuming token is in the Authorization header
-// //   if (!token)
-// //     return res
-// //       .status(401)
-// //       .json({ message: "Access Denied. No token provided." });
+/**
+ * JWT Authentication Middleware
+ * Verifies the token and sets req.decoded with user data
+ */
+const verifyToken = (req, res, next) => {
+  let token = "";
 
-// //   try {
-// //     const verified = jwt.verify(token, config.secret); // Replace with your secret key
-// //     req.user = verified;
-// //     next(); // Move to the next middleware or route handler
-// //   } catch (err) {
-// //     if (err.name === "TokenExpiredError") {
-// //       return res.status(401).json({ message: "Token has expired." });
-// //     }
-// //     return res.status(400).json({ message: "Invalid token." });
-// //   }
-// // };
+  if (req.headers["authorization"]) {
+    // Extract the token by removing the 'Bearer ' part
+    token = req.headers["authorization"].substring(
+      req.headers["authorization"].indexOf(" ") + 1
+    );
+  }
 
-// // module.exports = verifyToken;
+  if (!token) {
+    return res
+      .status(401)
+      .json({ success: false, message: "No token provided" });
+  }
 
-// const jwt = require("jsonwebtoken");
+  // Decrypt and verify the token
+  jwt.verify(token, config.secret, (err, decoded) => {
+    if (err) {
+      // Handle expired or invalid token
+      if (err.name === "TokenExpiredError") {
+        return res.status(401).json({
+          success: false,
+          message: "Token has expired. Please log in again.",
+        });
+      } else if (err.name === "JsonWebTokenError") {
+        return res.status(400).json({
+          success: false,
+          message: "Token is invalid: " + err.message,
+        });
+      } else {
+        return res.status(500).json({
+          success: false,
+          message: "Internal server error during authentication.",
+        });
+      }
+    } else {
+      // Assign the decoded token to request object
+      req.decoded = decoded;
+      next(); // Proceed to the next middleware or route handler
+    }
+  });
+};
 
-// const verifyToken = (req, res, next) => {
-//   const token = req.headers["authorization"]; // Assuming token is in the Authorization header
-//   if (!token)
-//     return res
-//       .status(401)
-//       .json({ message: "Access Denied. No token provided autMiddleware." });
-
-//   try {
-//     // const verified = jwt.verify(token, config.secret); // Replace with your secret key
-
-//     const verified = jwt.verify(token, config.secret, (err, decoded) => {
-//       if (err) {
-//         // Handle expired or invalid token
-//         if (err.name === "TokenExpiredError") {
-//           return res.status(401).json({
-//             success: false,
-//             message: "Token has expired. Please log in again.",
-//           });
-//         } else if (err.name === "JsonWebTokenError") {
-//           return res.status(400).json({
-//             success: false,
-//             message: "Token is invalid: " + err.message,
-//           });
-//         } else {
-//           return res
-//             .status(500)
-//             .json({ success: false, message: "Internal server error Or Token Expired." });
-//         }
-//       } else {
-//         // Assign the decoded token to request headers
-//         req.decoded = decoded;
-//         // req.user = verified;
-//         next(); // Proceed to the next middleware or route handler
-//       }
-//     });
-
-//     // req.user = verified;
-//     // next(); // Move to the next middleware or route handler
-//   } catch (err) {
-//     if (err.name === "TokenExpiredError") {
-//       // Handle expired token
-//       return res
-//         .status(401)
-//         .json({ message: "Token has expired. Please log in again." });
-//     } else if (err.name === "JsonWebTokenError") {
-//       // Handle other JWT errors (e.g., invalid token)
-//       return res.status(400).json({ message: "Invalid token." });
-//     } else {
-//       // Handle other errors
-//       return res.status(500).json({ message: "Internal server error Or Token Expired." });
-//     }
-//   }
-// };
-
-// module.exports = verifyToken;
+module.exports = verifyToken;

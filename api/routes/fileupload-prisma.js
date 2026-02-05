@@ -292,6 +292,29 @@ module.exports = (router) => {
       const finalFileName = `${md5(newFileName)}${ext ? `.${ext}` : ""}`;
 
       try {
+        // Get the visibleId from JWT token
+        const tokenVisibleId = req.decoded?.id || "";
+
+        if (!tokenVisibleId) {
+          return res.json({
+            success: false,
+            message: "Invalid user reference for avatar upload.",
+          });
+        }
+
+        // Look up the actual user id from visibleId (for FK constraint)
+        const user = await prisma.user.findFirst({
+          where: { visibleId: tokenVisibleId },
+          select: { id: true },
+        });
+
+        if (!user) {
+          return res.json({
+            success: false,
+            message: "User not found for avatar upload.",
+          });
+        }
+
         if (fs.existsSync(file.filepath)) {
           fs.rename(
             file.filepath,
@@ -304,14 +327,14 @@ module.exports = (router) => {
                 });
               }
 
-              // Create file record
+              // Create file record with the actual user.id (not visibleId)
               const fileRecord = await prisma.fileUpload.create({
                 data: {
                   visibleId: uuidv4(),
                   source: finalFileName,
-                  userId: req.decoded?.id || "",
+                  userId: user.id,
                   forField: "avatar",
-                  objectiveId: "dummy_id",
+                  objectiveId: null,
                   filetype: file.mimetype?.substring(0, file.mimetype.indexOf("/")) || "image",
                 },
               });
@@ -335,12 +358,13 @@ module.exports = (router) => {
           });
         }
       } catch (uploadErr) {
+        console.error("add avatar error", uploadErr);
         res.json({ success: false, message: uploadErr.message });
       }
     });
 
     form.on("error", (err) => {
-      console.log("An error has occurred: " + err);
+      console.log("add avatar error uploading image");
       res.json({ success: false, message: err.message });
     });
 
@@ -350,6 +374,77 @@ module.exports = (router) => {
 
     form.parse(req);
   });
+
+  // Add avatar (for profile pictures in images folder)
+//   router.post("/addAvatar", (req, res) => {
+//     const form = new formidable.IncomingForm();
+//     form.uploadDir = path.join(__dirname, "..", "images");
+//     form.maxFileSize = 10 * 1024 * 1024; // 10MB limit
+
+//     form.on("file", async (field, file) => {
+//       const newFileName = ["avatar", Math.random(), Math.random(), Math.random()].join("");
+//       const ext = file.originalFilename?.split(".").pop();
+//       const finalFileName = `${md5(newFileName)}${ext ? `.${ext}` : ""}`;
+
+//       try {
+//         if (fs.existsSync(file.filepath)) {
+//           fs.rename(
+//             file.filepath,
+//             path.join(form.uploadDir, finalFileName),
+//             async (err) => {
+//               if (err) {
+//                 return res.json({
+//                   success: false,
+//                   message: err.name + " " + err.message,
+//                 });
+//               }
+
+//               // Create file record
+//               const fileRecord = await prisma.fileUpload.create({
+//                 data: {
+//                   visibleId: uuidv4(),
+//                   source: finalFileName,
+//                   userId: req.decoded?.id || "",
+//                   forField: "avatar",
+//                   objectiveId: "dummy_id",
+//                   filetype: file.mimetype?.substring(0, file.mimetype.indexOf("/")) || "image",
+//                 },
+//               });
+
+//               res.json({
+//                 success: true,
+//                 message: "Avatar uploaded successfully",
+//                 data: {
+//                   id: fileRecord.visibleId,
+//                   source: fileRecord.source,
+//                   for: fileRecord.forField,
+//                   filetype: fileRecord.filetype,
+//                 },
+//               });
+//             }
+//           );
+//         } else {
+//           return res.json({
+//             success: false,
+//             message: "Something went wrong please re-upload your image.",
+//           });
+//         }
+//       } catch (uploadErr) {
+//         res.json({ success: false, message: uploadErr.message });
+//       }
+//     });
+
+//     form.on("error", (err) => {
+//       console.log("An error has occurred: " + err);
+//       res.json({ success: false, message: err.message });
+//     });
+
+//     form.on("end", () => {
+//       console.log("Avatar upload form parsing ended");
+//     });
+
+//     form.parse(req);
+//   });
 
   return router;
 };
