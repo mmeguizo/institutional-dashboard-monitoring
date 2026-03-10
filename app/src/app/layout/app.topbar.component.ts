@@ -156,7 +156,7 @@ export class AppTopBarComponent implements OnInit {
     // products: Product[] = [];
     selectedProduct: Product = {};
     loading = true;
-    
+
 
     notificationDialogVisible: boolean = false;
     selectedNotification: any;
@@ -226,6 +226,8 @@ export class AppTopBarComponent implements OnInit {
         this.dangerousUrl = this.sanitizer.bypassSecurityTrustUrl(
             this.auth.domain + '/images/' + this.profile_pic || 'no-photo.png'
         );
+        console.log(this.auth.domain)
+        console.log(this.profile_pic)
         this.createForm();
 
         this.getAllusers();
