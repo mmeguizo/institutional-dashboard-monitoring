@@ -1,6 +1,6 @@
 // Prisma Schema for IDM (Institutional Dashboard Monitoring)
 // MySQL Database - Migrated from MongoDB
-
+// @ts-ignore
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,39 +14,39 @@ datasource db {
 // USER MODEL
 // ============================================
 model User {
-  id                  String   @id @default(uuid())
-visibleId           String   @unique @default(uuid()) @map("visible_id")
-  email               String   @unique
-  firstname           String
-  lastname            String
-  username            String   @unique
-  campus              String
-  department          String?  @default("")
-  role                UserRole @default(OFFICE_HEAD)
-  departmentId        String?  @map("department_id")
-  vicePresidentId     String?  @map("vice_president_id")
-  vicePresidentName   String?  @map("vice_president_name")
-  directorId          String?  @map("director_id")
-  directorName        String?  @map("director_name")
-  officeHeadId        String?  @map("office_head_id")
-  officeHeadName      String?  @map("office_head_name")
-  status              String   @default("pending")
-  deleted             Boolean  @default(false)
-  password            String
-  profilePic          String   @default("no-photo.png") @map("profile_pic")
-  createdAt           DateTime @default(now()) @map("created_at")
-  updatedAt           DateTime @updatedAt @map("updated_at")
+  id                String   @id @default(uuid())
+  visibleId         String   @unique @default(uuid()) @map("visible_id")
+  email             String   @unique
+  firstname         String
+  lastname          String
+  username          String   @unique
+  campus            String
+  department        String?  @default("")
+  role              UserRole @default(OFFICE_HEAD)
+  departmentId      String?  @map("department_id")
+  vicePresidentId   String?  @map("vice_president_id")
+  vicePresidentName String?  @map("vice_president_name")
+  directorId        String?  @map("director_id")
+  directorName      String?  @map("director_name")
+  officeHeadId      String?  @map("office_head_id")
+  officeHeadName    String?  @map("office_head_name")
+  status            String   @default("pending")
+  deleted           Boolean  @default(false)
+  password          String
+  profilePic        String   @default("no-photo.png") @map("profile_pic")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
 
   // Relations
-  goals               Goal[]
-  objectives          Objective[]
-  notifications       Notification[]
+  goals                 Goal[]
+  objectives            Objective[]
+  notifications         Notification[]
   notificationsReceived Notification[] @relation("NotificationRecipient")
-  remarks             Remark[]
-  fileUploads         FileUpload[]
-  userHistories       UserHistory[]
-  aiChats             AiChat[]
-  departmentRef       Department?    @relation(fields: [departmentId], references: [id])
+  remarks               Remark[]
+  fileUploads           FileUpload[]
+  userHistories         UserHistory[]
+  aiChats               AiChat[]
+  departmentRef         Department?    @relation(fields: [departmentId], references: [id])
 
   @@index([deleted, role])
   @@index([directorId, deleted])
@@ -69,20 +69,20 @@ enum UserRole {
 // DEPARTMENT MODEL
 // ============================================
 model Department {
-  id              String   @id @default(uuid())
-  visibleId       String   @unique @default(uuid()) @map("visible_id")
-  department      String   @unique
-  departmentHead  String   @default("unassigned") @map("department_head")
-  userId          String?  @map("user_id")
-  campus          String   @default("Talisay")
-  status          String   @default("active")
-  deleted         Boolean  @default(false)
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  id             String   @id @default(uuid())
+  visibleId      String   @unique @default(uuid()) @map("visible_id")
+  department     String   @unique
+  departmentHead String   @default("unassigned") @map("department_head")
+  userId         String?  @map("user_id")
+  campus         String   @default("Talisay")
+  status         String   @default("active")
+  deleted        Boolean  @default(false)
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
 
   // Relations
-  users           User[]
-  goals           Goal[]
+  users User[]
+  goals Goal[]
 
   @@index([status, deleted])
   @@map("departments")
@@ -92,12 +92,12 @@ model Department {
 // CAMPUS MODEL
 // ============================================
 model Campus {
-  id          String   @id @default(uuid())
-  visibleId   String   @unique @default(uuid()) @map("visible_id")
-  campusName  String   @map("campus_name")
-  deleted     Boolean  @default(false)
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id         String   @id @default(uuid())
+  visibleId  String   @unique @default(uuid()) @map("visible_id")
+  campusName String   @map("campus_name")
+  deleted    Boolean  @default(false)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
   @@index([deleted])
   @@map("campuses")
@@ -107,18 +107,18 @@ model Campus {
 // GOALLIST MODEL (Templates/Categories)
 // ============================================
 model Goallist {
-  id          String   @id @default(uuid())
-  visibleId   String   @unique @default(uuid()) @map("visible_id")
-  goals       String
-  dateAdded   DateTime @default(now()) @map("date_added")
-  createdBy   String?  @map("created_by")
-  deleted     Boolean  @default(false)
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id        String   @id @default(uuid())
+  visibleId String   @unique @default(uuid()) @map("visible_id")
+  goals     String
+  dateAdded DateTime @default(now()) @map("date_added")
+  createdBy String?  @map("created_by")
+  deleted   Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
   goallistObjectives GoallistObjective[]
-  goalsRef          Goal[]
+  goalsRef           Goal[]
 
   @@index([deleted])
   @@index([createdBy, deleted])
@@ -128,16 +128,16 @@ model Goallist {
 
 // Embedded objectives in goallists (normalized for MySQL)
 model GoallistObjective {
-  id          String   @id @default(uuid())
-  visibleId   String   @unique @default(uuid()) @map("visible_id")
-  objective   String
-  createdBy   String?  @map("created_by")
-  deleted     Boolean  @default(false)
-  createdAt   DateTime @default(now()) @map("created_at")
-  
+  id        String   @id @default(uuid())
+  visibleId String   @unique @default(uuid()) @map("visible_id")
+  objective String
+  createdBy String?  @map("created_by")
+  deleted   Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
   // Relations
-  goallistId  String   @map("goallist_id")
-  goallist    Goallist @relation(fields: [goallistId], references: [id], onDelete: Cascade)
+  goallistId String   @map("goallist_id")
+  goallist   Goallist @relation(fields: [goallistId], references: [id], onDelete: Cascade)
 
   @@index([goallistId, deleted])
   @@map("goallist_objectives")
@@ -147,30 +147,30 @@ model GoallistObjective {
 // GOAL MODEL
 // ============================================
 model Goal {
-  id                  String   @id @default(uuid())
-  visibleId           String   @unique @default(uuid()) @map("visible_id")
-  goals               String   @db.Text
-  strategicObjective  String   @map("strategic_objective") @db.Text
-  strategicId         String   @map("strategic_id")
-  campus              String
-  department          String
-  budget              Decimal? @db.Decimal(15, 2)
-  dateAdded           DateTime @default(now()) @map("date_added")
-  createdBy           String?  @map("created_by")
-  goallistsId         String?  @map("goallists_id")
-  updatedBy           String?  @map("updated_by")
-  updateDate          DateTime? @map("update_date")
-  complete            Boolean  @default(false)
-  deleted             Boolean  @default(false)
-  createdAt           DateTime @default(now()) @map("created_at")
-  updatedAt           DateTime @updatedAt @map("updated_at")
+  id                 String    @id @default(uuid())
+  visibleId          String    @unique @default(uuid()) @map("visible_id")
+  goals              String    @db.Text
+  strategicObjective String    @map("strategic_objective") @db.Text
+  strategicId        String    @map("strategic_id")
+  campus             String
+  department         String
+  budget             Decimal?  @db.Decimal(15, 2)
+  dateAdded          DateTime  @default(now()) @map("date_added")
+  createdBy          String?   @map("created_by")
+  goallistsId        String?   @map("goallists_id")
+  updatedBy          String?   @map("updated_by")
+  updateDate         DateTime? @map("update_date")
+  complete           Boolean   @default(false)
+  deleted            Boolean   @default(false)
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
 
   // Relations
-  creator             User?       @relation(fields: [createdBy], references: [id])
-  goallist            Goallist?   @relation(fields: [goallistsId], references: [id])
-  departmentRef       Department? @relation(fields: [department], references: [department])
-  objectives          Objective[]
-  objectiveBudgets    ObjectiveBudget[]
+  creator          User?             @relation(fields: [createdBy], references: [id])
+  goallist         Goallist?         @relation(fields: [goallistsId], references: [id])
+  departmentRef    Department?       @relation(fields: [department], references: [department])
+  objectives       Objective[]
+  objectiveBudgets ObjectiveBudget[]
 
   @@index([deleted, createdBy])
   @@index([deleted, department])
@@ -183,11 +183,11 @@ model Goal {
 
 // Objective budgets (embedded array in MongoDB, normalized for MySQL)
 model ObjectiveBudget {
-  id          String   @id @default(uuid())
-  budget      Decimal  @db.Decimal(15, 2)
-  goalId      String   @map("goal_id")
-  goal        Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
-  objectiveId String?  @map("objective_id")
+  id          String  @id @default(uuid())
+  budget      Decimal @db.Decimal(15, 2)
+  goalId      String  @map("goal_id")
+  goal        Goal    @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  objectiveId String? @map("objective_id")
 
   @@index([goalId])
   @@map("objective_budgets")
@@ -197,118 +197,118 @@ model ObjectiveBudget {
 // OBJECTIVE MODEL
 // ============================================
 model Objective {
-  id                    String    @id @default(uuid())
-  visibleId             String    @unique @default(uuid()) @map("visible_id")
-  userId                String    @map("user_id")
-  goalId                String?   @map("goal_id")
-  goalVisibleId         String?   @map("goal_visible_id")
-  strategicObjective    String?   @map("strategic_objective") @db.Text
-  functionalObjective   String?   @map("functional_objective") @db.Text
-  performanceIndicator  String?   @map("performance_indicator") @db.Text
-  target                Float?
-  formula               String?   @db.Text
-  programs              String?   @db.Text
-  responsiblePersons    String?   @map("responsible_persons")
-  clients               String?
-  remarks               String?   @db.Text
-  frequencyMonitoring   String?   @map("frequency_monitoring") @default("monthly")
-  typeOfComputation     String?   @map("type_of_computation") @default("non-cumulative")
-  timetable             DateTime?
-  dataSource            String?   @map("data_source")
-  budget                Decimal?  @db.Decimal(15, 2)
-  status                String?   @default("active")
-  complete              Boolean   @default(false)
-  deleted               Boolean   @default(false)
-  createdBy             String?   @map("created_by")
-  updateBy              String?   @map("update_by")
-  updateDate            DateTime? @map("update_date")
-  dateAdded             DateTime? @map("date_added") @default(now())
-  createdAt             DateTime  @default(now()) @map("created_at")
-  updatedAt             DateTime  @updatedAt @map("updated_at")
+  id                   String    @id @default(uuid())
+  visibleId            String    @unique @default(uuid()) @map("visible_id")
+  userId               String    @map("user_id")
+  goalId               String?   @map("goal_id")
+  goalVisibleId        String?   @map("goal_visible_id")
+  strategicObjective   String?   @map("strategic_objective") @db.Text
+  functionalObjective  String?   @map("functional_objective") @db.Text
+  performanceIndicator String?   @map("performance_indicator") @db.Text
+  target               Float?
+  formula              String?   @db.Text
+  programs             String?   @db.Text
+  responsiblePersons   String?   @map("responsible_persons")
+  clients              String?
+  remarks              String?   @db.Text
+  frequencyMonitoring  String?   @default("monthly") @map("frequency_monitoring")
+  typeOfComputation    String?   @default("non-cumulative") @map("type_of_computation")
+  timetable            DateTime?
+  dataSource           String?   @map("data_source")
+  budget               Decimal?  @db.Decimal(15, 2)
+  status               String?   @default("active")
+  complete             Boolean   @default(false)
+  deleted              Boolean   @default(false)
+  createdBy            String?   @map("created_by")
+  updateBy             String?   @map("update_by")
+  updateDate           DateTime? @map("update_date")
+  dateAdded            DateTime? @default(now()) @map("date_added")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
 
   // Monthly values (0-11)
-  month0                Int?      @map("month_0")
-  month0Date            DateTime? @map("month_0_date")
-  month1                Int?      @map("month_1")
-  month1Date            DateTime? @map("month_1_date")
-  month2                Int?      @map("month_2")
-  month2Date            DateTime? @map("month_2_date")
-  month3                Int?      @map("month_3")
-  month3Date            DateTime? @map("month_3_date")
-  month4                Int?      @map("month_4")
-  month4Date            DateTime? @map("month_4_date")
-  month5                Int?      @map("month_5")
-  month5Date            DateTime? @map("month_5_date")
-  month6                Int?      @map("month_6")
-  month6Date            DateTime? @map("month_6_date")
-  month7                Int?      @map("month_7")
-  month7Date            DateTime? @map("month_7_date")
-  month8                Int?      @map("month_8")
-  month8Date            DateTime? @map("month_8_date")
-  month9                Int?      @map("month_9")
-  month9Date            DateTime? @map("month_9_date")
-  month10               Int?      @map("month_10")
-  month10Date           DateTime? @map("month_10_date")
-  month11               Int?      @map("month_11")
-  month11Date           DateTime? @map("month_11_date")
+  month0      Int?      @map("month_0")
+  month0Date  DateTime? @map("month_0_date")
+  month1      Int?      @map("month_1")
+  month1Date  DateTime? @map("month_1_date")
+  month2      Int?      @map("month_2")
+  month2Date  DateTime? @map("month_2_date")
+  month3      Int?      @map("month_3")
+  month3Date  DateTime? @map("month_3_date")
+  month4      Int?      @map("month_4")
+  month4Date  DateTime? @map("month_4_date")
+  month5      Int?      @map("month_5")
+  month5Date  DateTime? @map("month_5_date")
+  month6      Int?      @map("month_6")
+  month6Date  DateTime? @map("month_6_date")
+  month7      Int?      @map("month_7")
+  month7Date  DateTime? @map("month_7_date")
+  month8      Int?      @map("month_8")
+  month8Date  DateTime? @map("month_8_date")
+  month9      Int?      @map("month_9")
+  month9Date  DateTime? @map("month_9_date")
+  month10     Int?      @map("month_10")
+  month10Date DateTime? @map("month_10_date")
+  month11     Int?      @map("month_11")
+  month11Date DateTime? @map("month_11_date")
 
   // Goal monthly values (0-11)
-  goalMonth0            Int?      @map("goal_month_0")
-  goalMonth0Date        DateTime? @map("goal_month_0_date")
-  goalMonth1            Int?      @map("goal_month_1")
-  goalMonth1Date        DateTime? @map("goal_month_1_date")
-  goalMonth2            Int?      @map("goal_month_2")
-  goalMonth2Date        DateTime? @map("goal_month_2_date")
-  goalMonth3            Int?      @map("goal_month_3")
-  goalMonth3Date        DateTime? @map("goal_month_3_date")
-  goalMonth4            Int?      @map("goal_month_4")
-  goalMonth4Date        DateTime? @map("goal_month_4_date")
-  goalMonth5            Int?      @map("goal_month_5")
-  goalMonth5Date        DateTime? @map("goal_month_5_date")
-  goalMonth6            Int?      @map("goal_month_6")
-  goalMonth6Date        DateTime? @map("goal_month_6_date")
-  goalMonth7            Int?      @map("goal_month_7")
-  goalMonth7Date        DateTime? @map("goal_month_7_date")
-  goalMonth8            Int?      @map("goal_month_8")
-  goalMonth8Date        DateTime? @map("goal_month_8_date")
-  goalMonth9            Int?      @map("goal_month_9")
-  goalMonth9Date        DateTime? @map("goal_month_9_date")
-  goalMonth10           Int?      @map("goal_month_10")
-  goalMonth10Date       DateTime? @map("goal_month_10_date")
-  goalMonth11           Int?      @map("goal_month_11")
-  goalMonth11Date       DateTime? @map("goal_month_11_date")
+  goalMonth0      Int?      @map("goal_month_0")
+  goalMonth0Date  DateTime? @map("goal_month_0_date")
+  goalMonth1      Int?      @map("goal_month_1")
+  goalMonth1Date  DateTime? @map("goal_month_1_date")
+  goalMonth2      Int?      @map("goal_month_2")
+  goalMonth2Date  DateTime? @map("goal_month_2_date")
+  goalMonth3      Int?      @map("goal_month_3")
+  goalMonth3Date  DateTime? @map("goal_month_3_date")
+  goalMonth4      Int?      @map("goal_month_4")
+  goalMonth4Date  DateTime? @map("goal_month_4_date")
+  goalMonth5      Int?      @map("goal_month_5")
+  goalMonth5Date  DateTime? @map("goal_month_5_date")
+  goalMonth6      Int?      @map("goal_month_6")
+  goalMonth6Date  DateTime? @map("goal_month_6_date")
+  goalMonth7      Int?      @map("goal_month_7")
+  goalMonth7Date  DateTime? @map("goal_month_7_date")
+  goalMonth8      Int?      @map("goal_month_8")
+  goalMonth8Date  DateTime? @map("goal_month_8_date")
+  goalMonth9      Int?      @map("goal_month_9")
+  goalMonth9Date  DateTime? @map("goal_month_9_date")
+  goalMonth10     Int?      @map("goal_month_10")
+  goalMonth10Date DateTime? @map("goal_month_10_date")
+  goalMonth11     Int?      @map("goal_month_11")
+  goalMonth11Date DateTime? @map("goal_month_11_date")
 
   // File monthly values (0-11)
-  fileMonth0            String?   @map("file_month_0")
-  fileMonth0Date        DateTime? @map("file_month_0_date")
-  fileMonth1            String?   @map("file_month_1")
-  fileMonth1Date        DateTime? @map("file_month_1_date")
-  fileMonth2            String?   @map("file_month_2")
-  fileMonth2Date        DateTime? @map("file_month_2_date")
-  fileMonth3            String?   @map("file_month_3")
-  fileMonth3Date        DateTime? @map("file_month_3_date")
-  fileMonth4            String?   @map("file_month_4")
-  fileMonth4Date        DateTime? @map("file_month_4_date")
-  fileMonth5            String?   @map("file_month_5")
-  fileMonth5Date        DateTime? @map("file_month_5_date")
-  fileMonth6            String?   @map("file_month_6")
-  fileMonth6Date        DateTime? @map("file_month_6_date")
-  fileMonth7            String?   @map("file_month_7")
-  fileMonth7Date        DateTime? @map("file_month_7_date")
-  fileMonth8            String?   @map("file_month_8")
-  fileMonth8Date        DateTime? @map("file_month_8_date")
-  fileMonth9            String?   @map("file_month_9")
-  fileMonth9Date        DateTime? @map("file_month_9_date")
-  fileMonth10           String?   @map("file_month_10")
-  fileMonth10Date       DateTime? @map("file_month_10_date")
-  fileMonth11           String?   @map("file_month_11")
-  fileMonth11Date       DateTime? @map("file_month_11_date")
+  fileMonth0      String?   @map("file_month_0")
+  fileMonth0Date  DateTime? @map("file_month_0_date")
+  fileMonth1      String?   @map("file_month_1")
+  fileMonth1Date  DateTime? @map("file_month_1_date")
+  fileMonth2      String?   @map("file_month_2")
+  fileMonth2Date  DateTime? @map("file_month_2_date")
+  fileMonth3      String?   @map("file_month_3")
+  fileMonth3Date  DateTime? @map("file_month_3_date")
+  fileMonth4      String?   @map("file_month_4")
+  fileMonth4Date  DateTime? @map("file_month_4_date")
+  fileMonth5      String?   @map("file_month_5")
+  fileMonth5Date  DateTime? @map("file_month_5_date")
+  fileMonth6      String?   @map("file_month_6")
+  fileMonth6Date  DateTime? @map("file_month_6_date")
+  fileMonth7      String?   @map("file_month_7")
+  fileMonth7Date  DateTime? @map("file_month_7_date")
+  fileMonth8      String?   @map("file_month_8")
+  fileMonth8Date  DateTime? @map("file_month_8_date")
+  fileMonth9      String?   @map("file_month_9")
+  fileMonth9Date  DateTime? @map("file_month_9_date")
+  fileMonth10     String?   @map("file_month_10")
+  fileMonth10Date DateTime? @map("file_month_10_date")
+  fileMonth11     String?   @map("file_month_11")
+  fileMonth11Date DateTime? @map("file_month_11_date")
 
   // Relations
-  user                  User      @relation(fields: [userId], references: [id])
-  goal                  Goal?     @relation(fields: [goalId], references: [id], onDelete: Cascade)
-  fileUploads           FileUpload[]
-  remarksRef            Remark[]
+  user        User         @relation(fields: [userId], references: [id])
+  goal        Goal?        @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  fileUploads FileUpload[]
+  remarksRef  Remark[]
 
   @@index([deleted, userId])
   @@index([goalId, deleted])
@@ -322,49 +322,49 @@ model Objective {
 // FILE UPLOAD MODEL
 // ============================================
 model FileUpload {
-  id              String    @id @default(uuid())
-  visibleId       String    @unique @default(uuid()) @map("visible_id")
-  source          String    @db.VarChar(255)
-  userId          String    @map("user_id")
-  forField        String    @map("for_field") @db.VarChar(50)
-  dateAdded       DateTime  @default(now()) @map("date_added")
-  status          Boolean   @default(true)
-  filetype        String?   @default("")
-  objectiveId     String?   @map("objective_id")
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
+  id          String   @id @default(uuid())
+  visibleId   String   @unique @default(uuid()) @map("visible_id")
+  source      String   @db.VarChar(255)
+  userId      String   @map("user_id")
+  forField    String   @map("for_field") @db.VarChar(50)
+  dateAdded   DateTime @default(now()) @map("date_added")
+  status      Boolean  @default(true)
+  filetype    String?  @default("")
+  objectiveId String?  @map("objective_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   // File monthly values
-  fileMonth0      String?   @map("file_month_0")
-  fileMonth1      String?   @map("file_month_1")
-  fileMonth2      String?   @map("file_month_2")
-  fileMonth3      String?   @map("file_month_3")
-  fileMonth4      String?   @map("file_month_4")
-  fileMonth5      String?   @map("file_month_5")
-  fileMonth6      String?   @map("file_month_6")
-  fileMonth7      String?   @map("file_month_7")
-  fileMonth8      String?   @map("file_month_8")
-  fileMonth9      String?   @map("file_month_9")
-  fileMonth10     String?   @map("file_month_10")
-  fileMonth11     String?   @map("file_month_11")
+  fileMonth0  String? @map("file_month_0")
+  fileMonth1  String? @map("file_month_1")
+  fileMonth2  String? @map("file_month_2")
+  fileMonth3  String? @map("file_month_3")
+  fileMonth4  String? @map("file_month_4")
+  fileMonth5  String? @map("file_month_5")
+  fileMonth6  String? @map("file_month_6")
+  fileMonth7  String? @map("file_month_7")
+  fileMonth8  String? @map("file_month_8")
+  fileMonth9  String? @map("file_month_9")
+  fileMonth10 String? @map("file_month_10")
+  fileMonth11 String? @map("file_month_11")
 
   // Quarterly files
-  fileQuarter0    String?   @map("file_quarter_0")
-  fileQuarter1    String?   @map("file_quarter_1")
-  fileQuarter2    String?   @map("file_quarter_2")
-  fileQuarter3    String?   @map("file_quarter_3")
+  fileQuarter0 String? @map("file_quarter_0")
+  fileQuarter1 String? @map("file_quarter_1")
+  fileQuarter2 String? @map("file_quarter_2")
+  fileQuarter3 String? @map("file_quarter_3")
 
   // Semi-annual files
-  fileSemiAnnual0 String?   @map("file_semi_annual_0")
-  fileSemiAnnual1 String?   @map("file_semi_annual_1")
-  fileSemiAnnual2 String?   @map("file_semi_annual_2")
+  fileSemiAnnual0 String? @map("file_semi_annual_0")
+  fileSemiAnnual1 String? @map("file_semi_annual_1")
+  fileSemiAnnual2 String? @map("file_semi_annual_2")
 
   // Yearly file
-  fileYearly0     String?   @map("file_yearly_0")
+  fileYearly0 String? @map("file_yearly_0")
 
   // Relations
-  user            User      @relation(fields: [userId], references: [id])
-  objective       Objective? @relation(fields: [objectiveId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id])
+  objective Objective? @relation(fields: [objectiveId], references: [id], onDelete: Cascade)
 
   @@index([userId, objectiveId])
   @@index([objectiveId, status])
@@ -376,24 +376,24 @@ model FileUpload {
 // NOTIFICATION MODEL
 // ============================================
 model Notification {
-  id              String    @id @default(uuid())
-  visibleId       String    @unique @default(uuid()) @map("visible_id")
-  userId          String    @map("user_id")
-  recipientId     String?   @map("recipient_id")
-  title           String?
-  message         String?   @db.Text
-  type            String?
-  isRead          Boolean   @default(false) @map("is_read")
-  metadata        Json?
-  goalDetails     Json?     @map("goal_details")
+  id               String   @id @default(uuid())
+  visibleId        String   @unique @default(uuid()) @map("visible_id")
+  userId           String   @map("user_id")
+  recipientId      String?  @map("recipient_id")
+  title            String?
+  message          String?  @db.Text
+  type             String?
+  isRead           Boolean  @default(false) @map("is_read")
+  metadata         Json?
+  goalDetails      Json?    @map("goal_details")
   objectiveDetails Json?    @map("objective_details")
-  userDetails     Json?     @map("user_details")
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
+  userDetails      Json?    @map("user_details")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
 
   // Relations
-  user            User      @relation(fields: [userId], references: [id])
-  recipient       User?     @relation("NotificationRecipient", fields: [recipientId], references: [id])
+  user      User  @relation(fields: [userId], references: [id])
+  recipient User? @relation("NotificationRecipient", fields: [recipientId], references: [id])
 
   @@index([userId, isRead])
   @@index([recipientId, isRead])
@@ -415,8 +415,8 @@ model Remark {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   // Relations
-  user        User      @relation(fields: [userId], references: [id])
-  objective   Objective @relation(fields: [objectiveId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id])
+  objective Objective @relation(fields: [objectiveId], references: [id], onDelete: Cascade)
 
   @@index([objectiveId, deleted])
   @@index([userId, deleted])
@@ -428,21 +428,21 @@ model Remark {
 // LOG MODEL
 // ============================================
 model Log {
-  id          String    @id @default(uuid())
-  method      String?
-  params      Json?
-  query       Json?
-  url         String?   @db.VarChar(500)
-  body        Json?
-  status      String?
-  duration    String?
-  date        DateTime?
-  statusCode  Int?      @map("status_code")
-  ip          String?
-  user        String?
-  deleted     Boolean   @default(false)
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
+  id         String    @id @default(uuid())
+  method     String?
+  params     Json?
+  query      Json?
+  url        String?   @db.VarChar(500)
+  body       Json?
+  status     String?
+  duration   String?
+  date       DateTime?
+  statusCode Int?      @map("status_code")
+  ip         String?
+  user       String?
+  deleted    Boolean   @default(false)
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
 
   @@index([date])
   @@index([user, date])
@@ -455,18 +455,18 @@ model Log {
 // USER HISTORY MODEL
 // ============================================
 model UserHistory {
-  id              String    @id @default(uuid())
-  userId          String    @map("user_id")
-  timestamp       DateTime  @default(now())
-  activityType    String?   @map("activity_type")
-  activityUrl     String?   @map("activity_url") @db.VarChar(500)
-  activityData    Json?     @map("activity_data")
-  activityAction  String?   @map("activity_action")
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
+  id             String   @id @default(uuid())
+  userId         String   @map("user_id")
+  timestamp      DateTime @default(now())
+  activityType   String?  @map("activity_type")
+  activityUrl    String?  @map("activity_url") @db.VarChar(500)
+  activityData   Json?    @map("activity_data")
+  activityAction String?  @map("activity_action")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
 
   // Relations
-  user            User      @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 
   @@index([userId, timestamp])
   @@index([activityType, timestamp])
@@ -478,16 +478,16 @@ model UserHistory {
 // AI CHAT MODEL
 // ============================================
 model AiChat {
-  id          String   @id @default(uuid())
-  chatId      String?  @map("chat_id")
-  userId      String   @map("user_id")
-  prompt      String?  @db.Text
-  responseAi  String?  @map("response_ai") @db.LongText
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id         String   @id @default(uuid())
+  chatId     String?  @map("chat_id")
+  userId     String   @map("user_id")
+  prompt     String?  @db.Text
+  responseAi String?  @map("response_ai") @db.LongText
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
   // Relations
-  user        User     @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@index([chatId])
